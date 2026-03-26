@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SortableJS 演示</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .container {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .item {
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            cursor: move;
+            transition: background 0.2s;
+        }
+
+        .item:hover {
+            background: #e0e0e0;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #c8ebfb;
+        }
+
+        .sortable-chosen {
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <h1>SortableJS 拖动演示</h1>
+
+    <div class="container">
+        <h2>列表重排（自动填充空位）</h2>
+        <div id="list">
+            <div class="item">项目 1 - 拖动我到其他位置</div>
+            <div class="item">项目 2 - 可以上下移动</div>
+            <div class="item">项目 3 - 自动填充空位</div>
+            <div class="item">项目 4 - 不会留下空洞</div>
+            <div class="item">项目 5 - 流畅的动画效果</div>
+        </div>
+    </div>
+
+    <script src="js/sortable.min.js"></script>
+    
+    <script>
+        // 初始化列表排序
+        const list = document.getElementById('list');
+        Sortable.create(list, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: function(evt) {
+                console.log('从位置', evt.oldIndex, '移动到', evt.newIndex);
+            }
+        });
+    </script>
+</body>
+</html>
