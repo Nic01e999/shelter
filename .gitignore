@@ -1,9 +1,29 @@
-.DS_Store
-.venv
-.idea
-__pycache__
-*.pyc
+# 备份文件
+*.backup
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+backend/.venv/
+backend/ai/.venv/
+*.egg-info/
+
+# 数据库
+*.db-journal
+
+# 环境变量
 .env
-*.env
-.ipynb_checkpoints
-database/
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db

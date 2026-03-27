@@ -18,60 +18,86 @@ SHELTER 是一个心理健康与专注力管理 Web 应用，结合 AI 陪伴、
 ```
 shelter/
 ├── index.html          # 主页面：圆形轨道 + 侧边面板
+├── server.py           # 服务器启动入口
 ├── css/style.css       # 样式：深色主题 + 渐变效果
 ├── js/
-│   ├── script.js       # 前端逻辑：拖拽、待办清单
+│   ├── main.js         # 主入口，事件绑定
+│   ├── circle.js       # 圆形轨道系统
+│   ├── todo.js         # 待办清单系统
+│   ├── drag.js         # 拖拽交互
+│   ├── api.js          # API 调用封装
 │   └── sortable.min.js # 拖拽库
-├── ai/                 # Python AI 代理（ReAct 模式）
-│   ├── agent.py        # ReActAgent 核心实现
-│   ├── prompt_template.py  # 系统提示模板
-│   └── pyproject.toml  # Python 依赖配置
+├── backend/
+│   ├── app.py          # Flask 应用主文件
+│   ├── database.py     # 数据库连接
+│   ├── routes/         # 路由模块
+│   │   ├── __init__.py
+│   │   ├── users.py    # 用户相关路由
+│   │   └── projects.py # 项目相关路由
+│   └── ai/             # Python AI 代理（ReAct 模式）
+│       ├── agent.py    # ReActAgent 核心实现
+│       └── prompt_template.py
 ├── database/
 │   └── user.db         # SQLite 数据库
 └── docs/
     └── draft.md        # 项目需求文档
 ```
 
-### 前端架构
+### 前端架构（模块化设计）
 
-**圆形轨道系统** (`js/script.js:1-82`)：
+**主入口** (`js/main.js`)：
+- 初始化应用，绑定全局事件
+- 协调各模块交互
+
+**圆形轨道系统** (`js/circle.js`)：
 - 项目以圆形轨道方式排列，通过极坐标计算位置
-- 支持鼠标拖拽调整项目角度
-- 选中项目后在侧边面板显示详情
+- 管理项目加载、保存、选择状态
+- 导出核心函数供其他模块使用
 
-**待办清单系统** (`js/script.js:84-134`)：
+**待办清单系统** (`js/todo.js`)：
 - 使用 `contenteditable` 实现内联编辑
 - 键盘快捷键：
   - `Enter`：创建新待办项
   - `Backspace`（空行）：删除当前项并聚焦相邻项
 - 动态创建/删除待办项，自动管理焦点
 
-### 后端架构
+**拖拽交互** (`js/drag.js`)：
+- 处理鼠标拖拽事件
+- 实时计算项目在圆形轨道上的角度
+- 拖拽结束后自动保存位置
 
-**ReAct Agent** (`ai/agent.py`)：
+### 后端架构（标准 Flask 结构）
+
+**应用主文件** (`backend/app.py`)：
+- Flask 应用初始化
+- 注册蓝图（Blueprint）
+- CORS 配置
+
+**路由模块** (`backend/routes/`)：
+- `users.py`：用户管理接口
+- `projects.py`：项目和待办事项接口
+- 使用蓝图组织路由，便于扩展
+
+**数据库层** (`backend/database.py`)：
+- SQLite 连接管理
+- 统一的数据库访问接口
+
+**ReAct Agent** (`backend/ai/agent.py`)：
 - 基于 DeepSeek API 的 ReAct（Reasoning + Acting）模式
 - 提供文件读写和终端命令执行能力
-- 详细使用说明见 `ai/README.md`
 
 ## 开发命令
 
-### Python AI 代理
+### 启动后端服务器
 
 ```bash
-# 进入 AI 目录
-cd ai
+# 方式 1：使用启动脚本（推荐）
+python server.py
 
-# 激活虚拟环境
-source .venv/bin/activate
+# 方式 2：直接运行 Flask 应用
+python backend/app.py
 
-# 安装依赖
-uv sync
-
-# 运行代理（当前目录）
-python agent.py
-
-# 运行代理（指定目录）
-python agent.py /path/to/project
+# 服务器将在 http://localhost:9999 启动
 ```
 
 ### 前端开发
@@ -80,9 +106,23 @@ python agent.py /path/to/project
 # 直接在浏览器打开 index.html
 open index.html
 
-# 或使用本地服务器
-python -m http.server 8000
-# 访问 http://localhost:8000
+# 注意：需要先启动后端服务器才能正常使用
+```
+
+### Python AI 代理
+
+```bash
+# 进入 AI 目录
+cd backend/ai
+
+# 激活虚拟环境
+source .venv/bin/activate
+
+# 安装依赖
+uv sync
+
+# 运行代理
+python agent.py
 ```
 
 ### 数据库
