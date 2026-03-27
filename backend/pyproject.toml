@@ -1,5 +1,5 @@
 [project]
-name = "agent"
+name = "shelter"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -8,9 +8,6 @@ dependencies = [
     "click>=8.2.1",
     "openai>=1.91.0",
     "python-dotenv>=1.1.1",
-]
-
-[tool.uv.workspace]
-members = [
-    "snake3",
+    "flask>=3.0.0",      
+    "flask-cors>=4.0.0"
 ]

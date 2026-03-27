@@ -1,0 +1,153 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #1a1a2e;
+  gap: 20px;
+}
+
+.container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+}
+
+.circle-track {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px dashed #4a4a6a;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+}
+
+.item {
+  position: absolute;
+  width: 10rem;
+  height: 5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.item:active {
+  cursor: grabbing;
+}
+
+.item.dragging {
+  z-index: 9999;
+  transform: scale(1.1);
+}
+
+.item.selected {
+  box-shadow: 0 0 0 3px #ffd700;
+}
+
+.panel {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+  display: flex;
+  gap: 10px;
+  padding: 20px;
+  background: #16213e;
+  border-radius: 10px;
+}
+
+#panel-control {
+  max-height: 5rem;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+#itemText {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background: #0f3460;
+  color: white;
+  font-size: 14px;
+  min-width: 200px;
+  max-height: 3rem;
+}
+
+.todo-list {
+  margin-top: 10px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #0f3460;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.todo-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.4;
+  color: white;
+  background: transparent;
+  min-height: 20px;
+}
+
+.todo-input:empty:before {
+  content: attr(data-placeholder);
+  color: #86868b;
+}
+
+.panel button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background: #667eea;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.panel button:hover {
+  background: #764ba2;
+
+}
+
+#task-break {
+  grid-column: 1/3;
+  grid-row: 2/3;
+}
