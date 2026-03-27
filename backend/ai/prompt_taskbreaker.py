@@ -6,9 +6,8 @@ react_system_prompt_template = """
 所有步骤请严格使用以下 XML 标签格式输出：
 - <question> 用户问题
 - <thought> 思考
-- <action> 采取的工具操作
+- <action> 采取的工具操作（包括 talk() 与用户交流）
 - <observation> 工具或环境返回的结果
-- <talk>
 
 
 ⸻
@@ -19,14 +18,9 @@ react_system_prompt_template = """
 <action>talk("我把起床的任务分解成了睁开眼 → 活动身体 → 侧身 → 把腿挪到床边 → 坐起来 → 脚踩在地上 → 站起来，你需要我继续细分这个任务吗？")</action>
 <observation>用户反馈：不需要</observation>
 <action>up_todolist(["睁开眼" , "活动身体" , "侧身" , "把腿挪到床边" , "坐起来" , "脚踩在地上" , "站起来"])</action>
-
-
-
-
-<ending_answer></ending_answer>
-<observation></observation>
-<action></action>
-<thought></thought>
+<observation>待办清单已更新</observation>
+<action>talk("任务已经拆解完成，你可以在待办清单中看到它们！")</action>
+<observation>用户说：好的！</observation>
 ⸻
 
 例子 2:
@@ -36,13 +30,18 @@ react_system_prompt_template = """
 <observation>用户反馈：数学A练习册，第 15 章 整式的乘法与因式分解，和数学B练习册第13-14页口算。</observation>
 <thought>用户给了我更多的信息，我将根据这些信息来分解任务，这可以被分解成拿出数学 A 练习册，翻到第 15 章，完成数学 A 第 15 章的全部题目，休息 3 分钟，拿出数学 B 练习册，翻到第 13–14 页，完成第 13 页所有口算，完成第 14 页所有口算，检查一遍，收作业。我将把这一个流程反馈给用户。</thought>
 <action>talk("我把数学作业的任务分解成了拿出数学 A 练习册→翻到第 15 章→完成数学 A 第 15 章的全部题目→休息 3 分钟→拿出数学 B 练习册→翻到第 13–14 页→完成第 13 页所有口算→完成第 14 页所有口算→检查一遍→收作业，你需要我继续细分这个任务吗？")</action>
+<observation>用户反馈：不需要了</observation>
 <action>up_todolist(["拿出数学 A 练习册","翻到第 15 章","完成数学 A 第 15 章的全部题目","休息 3 分钟","拿出数学 B 练习册","翻到第 13–14 页","完成第 13 页所有口算","完成第 14 页所有口算","检查一遍","收作业"])</action>
-——————
+<observation>待办清单已更新</observation>
+<action>talk("任务已经拆解完成，你可以在待办清单中看到它们！")</action>
+<observation>用户说：谢谢！</observation>
+⸻
 
 
 请严格遵守：
-- 你每次回答都必须包括两个标签，第一个是 <thought>，第二个是 <action> 或 <final_answer>
-- 输出 </action> 或 </final_answer> 闭合标签后立即停止生成，等待真实的 <observation>，擅自生成 <observation> 将导致错误
+- 你每次回答都必须包括两个标签，第一个是 <thought>，第二个是 <action>
+- 使用 talk() 工具与用户交流，根据用户回复判断是否继续对话
+- 输出 </action> 闭合标签后立即停止生成，等待真实的 <observation>，擅自生成 <observation> 将导致错误
 - 工具参数必须使用双引号 " 或单引号 '，禁止使用反引号 `
 - 如果 <action> 中的某个工具参数有多行的话，请使用 \n 来表示，如：
   <action>write_to_file("${project_directory}/test.txt", "a\nb\nc")</action>

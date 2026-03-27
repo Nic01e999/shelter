@@ -10,22 +10,24 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import platform
 
-from ai.ai.prompt_template import react_system_prompt_template
+from prompts import get_prompt
 
 
 class ReActAgent:
-    def __init__(self, tools: List[Callable], model: str, project_directory: str):
+    def __init__(self, tools: List[Callable], model: str, project_directory: str, role: str = 'psychology'):
         self.tools = { func.__name__: func for func in tools }
         self.model = model
         self.project_directory = project_directory
+        self.role = role
         self.client = OpenAI(
             base_url="https://api.deepseek.com",
             api_key=ReActAgent.get_api_key(),
         )
 
     def run(self, user_input: str):
+        prompt_template = get_prompt(self.role)
         messages = [
-            {"role": "system", "content": self.render_system_prompt(react_system_prompt_template)},
+            {"role": "system", "content": self.render_system_prompt(prompt_template)},
             {"role": "user", "content": f"<question>{user_input}</question>"}
         ]
 
@@ -40,10 +42,7 @@ class ReActAgent:
                 thought = thought_match.group(1)
                 print(f"\n\n💭 Thought: {thought}")
 
-            # 检测模型是否输出 Final Answer，如果是的话，直接返回
-            if "<final_answer>" in content:
-                final_answer = re.search(r"<final_answer>(.*?)</final_answer>", content, re.DOTALL)
-                return final_answer.group(1)
+            # 不再检测 final_answer，由 talk() 工具处理所有用户交互
 
             # 检测 Action
             action_match = re.search(r"<action>(.*?)</action>", content, re.DOTALL)
@@ -226,23 +225,52 @@ def run_terminal_command(command):
     run_result = subprocess.run(command, shell=True, capture_output=True, text=True)
     return "执行成功" if run_result.returncode == 0 else run_result.stderr
 
+def talk(message: str) -> str:
+    """与用户对话，等待用户回复"""
+    print(f"\n🤖 AI: {message}")
+    user_reply = input("\n👤 你: ")
+    return user_reply
+
+def websearch(query: str) -> str:
+    """模拟网络搜索（实际项目中需接入真实搜索 API）"""
+    return f"[搜索结果] 关于 '{query}' 的信息：这是一个常见问题，建议采取相应措施。"
+
+def up_todolist(items: list) -> str:
+    """更新待办清单（需要与前端 API 集成）"""
+    print(f"\n📝 待办清单已更新：")
+    for i, item in enumerate(items, 1):
+        print(f"  {i}. {item}")
+    return "待办清单已更新"
+
+def task_breaker(task: str) -> str:
+    """调用任务拆解助手（实际会启动 taskbreaker 角色的 agent）"""
+    return f"任务 '{task}' 已拆解并添加到待办清单"
+
 @click.command()
+@click.option('--role', type=click.Choice(['psychology', 'taskbreaker']),
+              default='psychology', help='选择 AI 角色：psychology(心理咨询师) 或 taskbreaker(任务拆解器)')
 @click.argument(
     'project_directory',
     type=click.Path(exists=True, file_okay=False, dir_okay=True),
-    required=False  # 关键：让它变成可选
+    required=False
 )
-def main(project_directory):
+def main(role, project_directory):
     # 没传路径就用当前目录
     if project_directory is None:
         project_dir = os.path.abspath(".")
     else:
         project_dir = os.path.abspath(project_directory)
 
-    tools = [read_file, write_to_file, run_terminal_command]
-    agent = ReActAgent(tools=tools, model="deepseek-chat", project_directory=project_dir)
+    # 根据角色选择工具集
+    if role == 'psychology':
+        tools = [talk, websearch, task_breaker, up_todolist, read_file, write_to_file]
+    else:  # taskbreaker
+        tools = [talk, up_todolist, read_file, write_to_file]
 
-    task = input("请输入任务：")
+    agent = ReActAgent(tools=tools, model="deepseek-chat", project_directory=project_dir, role=role)
+
+    print(f"\n🤖 当前角色：{'心理咨询师' if role == 'psychology' else '任务拆解器'}")
+    task = input("\n请输入任务：")
 
     final_answer = agent.run(task)
 
