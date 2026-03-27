@@ -1,11 +1,13 @@
 // 主入口文件
 import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition } from './circle.js';
 import { initModefire } from './modefire.js';
+import { initAudio, togglePlay, changeSound, setVolume } from './audio.js';
 import './drag.js';
 
 // 初始化
 loadProjects();
 initModefire();
+initAudio();
 
 // 宠物聊天窗口切换
 const petImg = document.getElementById('petImg');
@@ -98,3 +100,14 @@ document.getElementById('addBtn').addEventListener('click', async () => {
   item.addEventListener('click', () => selectItem(item, { tasks: [] }));
   await saveProject(item);
 });
+
+// 白噪音控制
+document.getElementById('audio-toggle').addEventListener('click', () => {
+  const isPlaying = togglePlay();
+  document.getElementById('audio-toggle').textContent = isPlaying ? '⏸️ Pause' : '▶️ Play';
+});
+
+document.getElementById('audio-source').addEventListener('change', (e) => {
+  changeSound(e.target.value);
+});
+

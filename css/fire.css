@@ -2,7 +2,7 @@
   grid-row: 2/3;
   grid-column: 2/3;
   height: 7rem;
-  width: 7rem;
+  width: 9rem;
   background: rgba(30, 30, 30, 0.6);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -13,6 +13,8 @@
   gap: 10px;
   padding: 20px;
   transition: all 0.3s;
+  margin: 0 auto;
+
 }
 
 #panel-modefire:hover {

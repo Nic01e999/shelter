@@ -17,7 +17,6 @@
 #panel-control {
   grid-row: 1/2;
   grid-column: 2/3;
-  max-height: 5rem;
   display: grid;
   gap: 5px;
   grid-template-columns: 1fr 1fr;
