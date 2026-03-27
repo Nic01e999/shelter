@@ -1,6 +1,5 @@
 // 主入口文件
-import { loadProjects, saveProject, selectItem } from './circle.js';
-import { getSelectedItem, setSelectedItem } from './circle.js';
+import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition } from './circle.js';
 import './drag.js';
 
 // 初始化
@@ -19,11 +18,13 @@ document.getElementById('itemText').addEventListener('input', (e) => {
 document.getElementById('deleteBtn').addEventListener('click', async () => {
   const selected = getSelectedItem();
   if (selected) {
+    const { loadProjectTasks } = await import('./todo.js');
     const projectId = selected.dataset.projectId;
     if (projectId) await api.deleteProject(projectId);
     selected.remove();
     setSelectedItem(null);
     document.getElementById('itemText').value = '';
+    loadProjectTasks([]);
   }
 });
 
@@ -34,7 +35,6 @@ document.getElementById('addBtn').addEventListener('click', async () => {
   item.dataset.angle = '0';
   item.textContent = '新项目';
   document.querySelector('.container').appendChild(item);
-  const { setPosition } = await import('./circle.js');
   setPosition(item, 0);
   item.addEventListener('click', () => selectItem(item, { tasks: [] }));
   await saveProject(item);

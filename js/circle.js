@@ -41,8 +41,7 @@ async function saveProject(item, saveTasks = false) {
   if (saveTasks && item === selectedItem) {
     tasks = getProjectTasks();
   } else if (projectId) {
-    const response = await fetch(`http://localhost:9999/api/projects/${currentUserId}`);
-    const projects = await response.json();
+    const projects = await api.getProjects(currentUserId);
     const currentProject = projects.find(p => p.id == projectId);
     tasks = currentProject ? currentProject.tasks : [];
   }
@@ -69,8 +68,7 @@ async function selectItem(item, project) {
 
   const projectId = item.dataset.projectId;
   if (projectId) {
-    const response = await fetch(`http://localhost:9999/api/projects/${currentUserId}`);
-    const projects = await response.json();
+    const projects = await api.getProjects(currentUserId);
     const latestProject = projects.find(p => p.id == projectId);
     if (latestProject) {
       loadProjectTasks(latestProject.tasks || []);
