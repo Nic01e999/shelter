@@ -4,24 +4,29 @@ let isPlaying = false;
 
 // 音源列表
 const sounds = {
-  rain: 'https://cdn.pixabay.com/download/audio/2022/03/10/audio_2b3f3c5d5f.mp3',
-  ocean: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0b2c0e3f5f.mp3',
-  cafe: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_3e8d9c4f2a.mp3'
+  rain: 'https://assets.mixkit.co/active_storage/sfx/2390/2390-preview.mp3',
+  ocean: 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3',
+  cafe: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3'
 };
 
 export function initAudio() {
   audio = document.getElementById('white-noise-audio');
   audio.loop = true;
-  audio.volume = 0.5;
+  audio.src = sounds.rain;
 }
 
 export function togglePlay() {
   if (isPlaying) {
     audio.pause();
+    isPlaying = false;
   } else {
-    audio.play();
+    audio.play().catch(err => {
+      console.error('播放失败:', err);
+      alert('音频播放失败，请检查网络连接或尝试其他音源');
+      isPlaying = false;
+    });
+    isPlaying = true;
   }
-  isPlaying = !isPlaying;
   return isPlaying;
 }
 

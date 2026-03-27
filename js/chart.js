@@ -36,10 +36,16 @@ function drawChart(data, view) {
 
   let labels, values;
   if (view === 'daily') {
-    labels = data.map(d => d.date.slice(5));
+    labels = data.map(d => {
+      const localDate = new Date(d.date + 'T00:00:00Z');
+      return `${localDate.getMonth() + 1}/${localDate.getDate()}`;
+    });
     values = data.map(d => d.duration);
   } else if (view === 'hourly') {
-    labels = data.map(d => d.hour.slice(11, 16));
+    labels = data.map(d => {
+      const localTime = new Date(d.hour + ':00Z');
+      return `${localTime.getHours()}:00`;
+    });
     values = data.map(d => d.duration);
   } else {
     labels = data.map(d => d.week.slice(5));

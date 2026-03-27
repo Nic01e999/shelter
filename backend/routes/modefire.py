@@ -4,7 +4,7 @@ import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from database import get_db
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 @modefire_bp.route('/api/modefire/save', methods=['POST'])
 def save_focus():
@@ -22,7 +22,7 @@ def save_focus():
 @modefire_bp.route('/api/modefire/history', methods=['GET'])
 def get_history():
     days = request.args.get('days', 7, type=int)
-    start_date = datetime.now() - timedelta(days=days)
+    start_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     conn = get_db()
     sessions = conn.execute(
@@ -35,7 +35,7 @@ def get_history():
     data_map = {row['date']: row['duration'] for row in sessions}
     result = []
     for i in range(days):
-        date = (datetime.now().date() - timedelta(days=days-1-i)).isoformat()
+        date = (datetime.now(timezone.utc).date() - timedelta(days=days-1-i)).isoformat()
         result.append({'date': date, 'duration': data_map.get(date, 0)})
 
     return jsonify(result)
@@ -43,7 +43,7 @@ def get_history():
 @modefire_bp.route('/api/modefire/history/hourly', methods=['GET'])
 def get_hourly_history():
     hours = request.args.get('hours', 24, type=int)
-    start_time = datetime.now() - timedelta(hours=hours)
+    start_time = datetime.now(timezone.utc) - timedelta(hours=hours)
 
     conn = get_db()
     sessions = conn.execute(
@@ -56,7 +56,7 @@ def get_hourly_history():
     data_map = {row['hour']: row['duration'] for row in sessions}
     result = []
     for i in range(hours):
-        hour_time = datetime.now() - timedelta(hours=hours-1-i)
+        hour_time = datetime.now(timezone.utc) - timedelta(hours=hours-1-i)
         hour_str = hour_time.strftime('%Y-%m-%dT%H:00')
         result.append({'hour': hour_str, 'duration': data_map.get(hour_str, 0)})
 
@@ -65,7 +65,7 @@ def get_hourly_history():
 @modefire_bp.route('/api/modefire/history/weekly', methods=['GET'])
 def get_weekly_history():
     weeks = request.args.get('weeks', 12, type=int)
-    start_date = datetime.now() - timedelta(weeks=weeks)
+    start_date = datetime.now(timezone.utc) - timedelta(weeks=weeks)
 
     conn = get_db()
     sessions = conn.execute(
@@ -78,7 +78,7 @@ def get_weekly_history():
     data_map = {row['week']: row['duration'] for row in sessions}
     result = []
     for i in range(weeks):
-        week_date = datetime.now() - timedelta(weeks=weeks-1-i)
+        week_date = datetime.now(timezone.utc) - timedelta(weeks=weeks-1-i)
         week_str = week_date.strftime('%Y-W%W')
         result.append({'week': week_str, 'duration': data_map.get(week_str, 0)})
 
