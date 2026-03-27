@@ -1,7 +1,8 @@
 #!/bin/bash
+cd "$(dirname "$0")"
 
-# 启动后端服务器
-python3 server.py &
+# 启动后端服务器（使用虚拟环境的 Python）
+backend/.venv/bin/python3 server.py &
 BACKEND_PID=$!
 
 # 启动前端服务器

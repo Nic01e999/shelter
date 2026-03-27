@@ -11,7 +11,57 @@ initModefire();
 const petImg = document.getElementById('petImg');
 const chatWindow = document.getElementById('chat-window');
 petImg.addEventListener('click', () => {
-  chatWindow.style.display = chatWindow.style.display === 'none' || chatWindow.style.display === '' ? 'block' : 'none';
+  chatWindow.style.display = chatWindow.style.display === 'none' || chatWindow.style.display === '' ? 'flex' : 'none';
+});
+
+// 聊天功能
+const chatInput = document.querySelector('.chat-input');
+const chatSendBtn = document.querySelector('.chat-send-btn');
+const chatMessages = document.querySelector('.chat-messages');
+
+async function sendMessage() {
+  const message = chatInput.value.trim();
+  if (!message) return;
+
+  // 显示用户消息
+  const userMsg = document.createElement('div');
+  userMsg.className = 'chat-message user-message';
+  userMsg.textContent = message;
+  chatMessages.appendChild(userMsg);
+  chatInput.value = '';
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  // 显示思考动画
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'typing-indicator';
+  typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+  chatMessages.appendChild(typingIndicator);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  try {
+    const response = await api.sendChatMessage(1, message);
+    typingIndicator.remove();
+    if (response.success) {
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'chat-message ai-message';
+      aiMsg.textContent = response.response;
+      chatMessages.appendChild(aiMsg);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  } catch (error) {
+    typingIndicator.remove();
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'chat-message ai-message';
+    errorMsg.textContent = '宠物遇到了点小意外...';
+    chatMessages.appendChild(errorMsg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    console.error('发送消息失败:', error);
+  }
+}
+
+chatSendBtn.addEventListener('click', sendMessage);
+chatInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendMessage();
 });
 
 // 项目标题编辑

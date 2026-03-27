@@ -24,14 +24,16 @@ class ReActAgent:
             api_key=ReActAgent.get_api_key(),
         )
 
-    def run(self, user_input: str):
+    def run(self, user_input: str, max_iterations: int = 5):
         prompt_template = get_prompt(self.role)
         messages = [
             {"role": "system", "content": self.render_system_prompt(prompt_template)},
             {"role": "user", "content": f"<question>{user_input}</question>"}
         ]
 
-        while True:
+        iteration = 0
+        while iteration < max_iterations:
+            iteration += 1
 
             # 请求模型
             content = self.call_model(messages)
@@ -67,11 +69,14 @@ class ReActAgent:
             tool_name, args = self.parse_action(action)
 
             print(f"\n\n🔧 Action: {tool_name}({', '.join(args)})")
-            # 只有终端命令才需要询问用户，其他的工具直接执行
-            should_continue = input(f"\n\n是否继续？（Y/N）") if tool_name == "run_terminal_command" else "y"
-            if should_continue.lower() != 'y':
-                print("\n\n操作已取消。")
-                return "操作被用户取消"
+
+            # Web 模式下，talk() 直接返回响应并结束
+            if tool_name == "talk":
+                try:
+                    response = self.tools[tool_name](*args)
+                    return response
+                except Exception as e:
+                    return f"错误：{str(e)}"
 
             try:
                 observation = self.tools[tool_name](*args)
@@ -226,25 +231,49 @@ def run_terminal_command(command):
     return "执行成功" if run_result.returncode == 0 else run_result.stderr
 
 def talk(message: str) -> str:
-    """与用户对话，等待用户回复"""
-    print(f"\n🤖 AI: {message}")
-    user_reply = input("\n👤 你: ")
-    return user_reply
+    """与用户对话，返回 AI 的回复"""
+    return message
 
 def websearch(query: str) -> str:
     """模拟网络搜索（实际项目中需接入真实搜索 API）"""
     return f"[搜索结果] 关于 '{query}' 的信息：这是一个常见问题，建议采取相应措施。"
 
-def up_todolist(items: list) -> str:
-    """更新待办清单（需要与前端 API 集成）"""
+def up_todolist(project_id: int, items: list) -> str:
+    """更新待办清单"""
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from database import get_db
+    import json
+
+    conn = get_db()
+    conn.execute(
+        'UPDATE todo_lists SET tasks = ? WHERE id = ?',
+        (json.dumps(items), project_id)
+    )
+    conn.commit()
+    conn.close()
+
     print(f"\n📝 待办清单已更新：")
     for i, item in enumerate(items, 1):
         print(f"  {i}. {item}")
     return "待办清单已更新"
 
-def task_breaker(task: str) -> str:
-    """调用任务拆解助手（实际会启动 taskbreaker 角色的 agent）"""
-    return f"任务 '{task}' 已拆解并添加到待办清单"
+def task_breaker(task: str, project_id: int) -> str:
+    """调用任务拆解助手"""
+    import sys
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from database import get_db
+
+    # 启动 taskbreaker 角色的 agent
+    tools = [talk, up_todolist, read_file, write_to_file]
+    agent = ReActAgent(tools=tools, model="deepseek-chat", project_directory=os.getcwd(), role='taskbreaker')
+
+    # 运行任务拆解
+    result = agent.run(f"请将以下任务拆解成具体的子任务：{task}")
+
+    return f"任务 '{task}' 已拆解完成"
 
 @click.command()
 @click.option('--role', type=click.Choice(['psychology', 'taskbreaker']),
@@ -263,7 +292,7 @@ def main(role, project_directory):
 
     # 根据角色选择工具集
     if role == 'psychology':
-        tools = [talk, websearch, task_breaker, up_todolist, read_file, write_to_file]
+        tools = [talk, websearch, task_breaker, read_file, write_to_file]
     else:  # taskbreaker
         tools = [talk, up_todolist, read_file, write_to_file]
 

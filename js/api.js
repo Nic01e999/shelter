@@ -57,5 +57,14 @@ const api = {
   async getFocusHistory(days = 7) {
     const res = await fetch(`${API_BASE}/modefire/history?days=${days}`);
     return res.json();
+  },
+
+  async sendChatMessage(userId, message, role = 'psychology') {
+    const res = await fetch(`${API_BASE}/ai/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, message, role })
+    });
+    return res.json();
   }
 };
