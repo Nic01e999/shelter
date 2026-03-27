@@ -1,0 +1,41 @@
+.todo-list {
+  margin-top: 10px;
+  height: 200px;
+  overflow-y: auto;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #0f3460;
+}
+
+.todo-item:last-child {
+  border-bottom: none;
+}
+
+.todo-checkbox {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.todo-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  line-height: 1.4;
+  color: white;
+  background: transparent;
+  min-height: 20px;
+}
+
+.todo-input:empty:before {
+  content: attr(data-placeholder);
+  color: #86868b;
+}

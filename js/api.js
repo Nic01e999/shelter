@@ -43,5 +43,19 @@ const api = {
       method: 'DELETE'
     });
     return res.json();
+  },
+
+  async saveFocus(startTime, endTime, duration) {
+    const res = await fetch(`${API_BASE}/modefire/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ start_time: startTime, end_time: endTime, duration })
+    });
+    return res.json();
+  },
+
+  async getFocusHistory(days = 7) {
+    const res = await fetch(`${API_BASE}/modefire/history?days=${days}`);
+    return res.json();
   }
 };

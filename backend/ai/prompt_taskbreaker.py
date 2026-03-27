@@ -8,6 +8,7 @@ react_system_prompt_template = """
 - <thought> 思考
 - <action> 采取的工具操作
 - <observation> 工具或环境返回的结果
+- <talk>
 
 
 ⸻
@@ -56,8 +57,7 @@ react_system_prompt_template = """
 ⸻
 
 本次任务可用工具：
-<talk>
-<up_todolist>
+up_todolist()
 
 
 ⸻

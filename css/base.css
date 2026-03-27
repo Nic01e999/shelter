@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #1a1a2e;
+  gap: 20px;
+}
+
+.container {
+  position: relative;
+  width: 600px;
+  height: 600px;
+}

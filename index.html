@@ -3,13 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>圆形轨道拖拽</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>shelter</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/circle.css">
+  <link rel="stylesheet" href="css/panel.css">
+  <link rel="stylesheet" href="css/todo.css">
+  <link rel="stylesheet" href="css/fire.css">
+  <link rel="stylesheet" href="css/chat.css">
 </head>
 <body>
   <div class="container">
     <div class="circle-track"></div>
-
   </div>
   <div class="panel">
     <div id="panel-display">
@@ -26,8 +30,23 @@
       <button id="deleteBtn">delete</button>
       <button id="task-break">TB</button>
     </div>
+    <div id="panel-modefire">
+      <button id="fire-toggle" class="fire-btn">🔥</button>
+      <a href="chart.html" target="_blank" id="fire-timer" class="fire-timer-link">00:00:00</a>
+    </div>
 
   </div>
+  <div class="pet">
+    <img>
+    <div id="chat-window">
+      <div class="chat-messages"></div>
+      <div class="chat-input-container">
+        <input type="text" class="chat-input" placeholder="输入消息...">
+        <button class="chat-send-btn">发送</button>
+      </div>
+    </div>
+  </div>
+
   <script src="js/api.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>

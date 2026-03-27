@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>专注历史</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/fire.css">
+  <style>
+    .chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 40px;
+    }
+    #fire-chart {
+      border: 2px solid #667eea;
+      border-radius: 8px;
+      background: rgba(22, 33, 62, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-container">
+    <canvas id="fire-chart" width="600" height="400"></canvas>
+  </div>
+  <script src="js/api.js"></script>
+  <script type="module" src="js/chart.js"></script>
+</body>
+</html>

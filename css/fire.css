@@ -1,0 +1,88 @@
+#panel-modefire {
+  grid-row: 2/3;
+  grid-column: 2/3;
+  height: 7rem;
+  width: 7rem;
+  background-color: #8080db;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+}
+
+#panel-modefire:active {
+  background-color: #ffd700;
+}
+
+.fire-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 15px 25px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 24px;
+  transition: all 0.3s;
+}
+
+.fire-btn.active {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  box-shadow: 0 0 20px rgba(240, 147, 251, 0.5);
+}
+
+#fire-timer {
+  font-size: 24px;
+  color: #ffd700;
+  font-family: monospace;
+}
+
+#fire-chart {
+  border: 1px solid #667eea;
+  border-radius: 4px;
+  background: rgba(22, 33, 62, 0.5);
+}
+
+.chart-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  transition: all 0.3s;
+}
+
+.chart-btn:hover {
+  transform: scale(1.05);
+}
+
+#chart-view {
+  margin-top: 10px;
+}
+
+.fire-timer-link {
+  font-size: 24px;
+  color: #ffd700;
+  font-family: monospace;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.fire-timer-link:hover {
+  color: #fff;
+  text-shadow: 0 0 10px #ffd700;
+}
+
+.back-link {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.back-link:hover {
+  color: #764ba2;
+}

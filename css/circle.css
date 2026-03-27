@@ -1,0 +1,39 @@
+.circle-track {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px dashed #4a4a6a;
+  border-radius: 50%;
+  top: 0;
+  left: 0;
+}
+
+.item {
+  position: absolute;
+  width: 10rem;
+  height: 5rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  transition: transform 0.2s;
+}
+
+.item:active {
+  cursor: grabbing;
+}
+
+.item.dragging {
+  z-index: 9999;
+  transform: scale(1.1);
+}
+
+.item.selected {
+  box-shadow: 0 0 0 3px #ffd700;
+}

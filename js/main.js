@@ -1,9 +1,11 @@
 // 主入口文件
 import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition } from './circle.js';
+import { initModefire } from './modefire.js';
 import './drag.js';
 
 // 初始化
 loadProjects();
+initModefire();
 
 // 项目标题编辑
 document.getElementById('itemText').addEventListener('input', (e) => {
