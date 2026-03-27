@@ -31,5 +31,55 @@ def get_history():
     ).fetchall()
     conn.close()
 
-    result = [{'date': row['date'], 'duration': row['duration']} for row in sessions]
+    # 时间轴补全
+    data_map = {row['date']: row['duration'] for row in sessions}
+    result = []
+    for i in range(days):
+        date = (datetime.now().date() - timedelta(days=days-1-i)).isoformat()
+        result.append({'date': date, 'duration': data_map.get(date, 0)})
+
+    return jsonify(result)
+
+@modefire_bp.route('/api/modefire/history/hourly', methods=['GET'])
+def get_hourly_history():
+    hours = request.args.get('hours', 24, type=int)
+    start_time = datetime.now() - timedelta(hours=hours)
+
+    conn = get_db()
+    sessions = conn.execute(
+        "SELECT strftime('%Y-%m-%dT%H:00', start_time) as hour, SUM(duration) as duration FROM focus_sessions WHERE start_time >= ? GROUP BY strftime('%Y-%m-%dT%H:00', start_time) ORDER BY hour",
+        (start_time.isoformat(),)
+    ).fetchall()
+    conn.close()
+
+    # 时间轴补全
+    data_map = {row['hour']: row['duration'] for row in sessions}
+    result = []
+    for i in range(hours):
+        hour_time = datetime.now() - timedelta(hours=hours-1-i)
+        hour_str = hour_time.strftime('%Y-%m-%dT%H:00')
+        result.append({'hour': hour_str, 'duration': data_map.get(hour_str, 0)})
+
+    return jsonify(result)
+
+@modefire_bp.route('/api/modefire/history/weekly', methods=['GET'])
+def get_weekly_history():
+    weeks = request.args.get('weeks', 12, type=int)
+    start_date = datetime.now() - timedelta(weeks=weeks)
+
+    conn = get_db()
+    sessions = conn.execute(
+        "SELECT strftime('%Y-W%W', start_time) as week, SUM(duration) as duration FROM focus_sessions WHERE start_time >= ? GROUP BY strftime('%Y-W%W', start_time) ORDER BY week",
+        (start_date.isoformat(),)
+    ).fetchall()
+    conn.close()
+
+    # 时间轴补全
+    data_map = {row['week']: row['duration'] for row in sessions}
+    result = []
+    for i in range(weeks):
+        week_date = datetime.now() - timedelta(weeks=weeks-1-i)
+        week_str = week_date.strftime('%Y-W%W')
+        result.append({'week': week_str, 'duration': data_map.get(week_str, 0)})
+
     return jsonify(result)

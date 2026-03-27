@@ -1,67 +1,103 @@
-async function loadHistory() {
+let chartInstance = null;
+let currentView = 'daily';
+
+async function loadChart(view) {
+  currentView = view;
+  let data;
+
   try {
-    console.log('Fetching history...');
-    const data = await api.getFocusHistory(7);
-    console.log('History data:', data);
-    drawChart(data);
+    if (view === 'daily') {
+      data = await api.getFocusHistory(7);
+    } else if (view === 'hourly') {
+      const response = await fetch('http://localhost:9999/api/modefire/history/hourly?hours=24');
+      data = await response.json();
+    } else if (view === 'weekly') {
+      const response = await fetch('http://localhost:9999/api/modefire/history/weekly?weeks=12');
+      data = await response.json();
+    }
+
+    drawChart(data, view);
   } catch (error) {
-    console.error('Error loading history:', error);
+    console.error('Error loading chart:', error);
   }
 }
 
-function drawChart(data) {
-  console.log('Drawing chart with data:', data);
+function drawChart(data, view) {
   const canvas = document.getElementById('fire-chart');
-  console.log('Canvas element:', canvas);
   const ctx = canvas.getContext('2d');
-  const width = canvas.width;
-  const height = canvas.height;
-  console.log('Canvas size:', width, height);
 
-  ctx.clearRect(0, 0, width, height);
-
-  // 绘制白色背景便于查看
-  ctx.fillStyle = '#1a1a2e';
-  ctx.fillRect(0, 0, width, height);
-
-  if (!data || data.length === 0) {
-    ctx.fillStyle = '#667eea';
-    ctx.font = '20px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('暂无数据', width / 2, height / 2);
-    return;
+  if (chartInstance) {
+    chartInstance.destroy();
   }
 
-  const maxDuration = Math.max(...data.map(d => d.duration));
-  const fixedBarWidth = 80;
-  const barSpacing = 20;
-  const totalWidth = data.length * (fixedBarWidth + barSpacing);
-  const startX = (width - totalWidth) / 2;
-  const padding = 40;
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, '#ff9a56');
+  gradient.addColorStop(1, '#ff6b35');
 
-  data.forEach((item, index) => {
-    const barHeight = ((item.duration / maxDuration) * (height - padding * 2));
-    const x = startX + index * (fixedBarWidth + barSpacing);
-    const y = height - padding - barHeight;
+  let labels, values;
+  if (view === 'daily') {
+    labels = data.map(d => d.date.slice(5));
+    values = data.map(d => d.duration);
+  } else if (view === 'hourly') {
+    labels = data.map(d => d.hour.slice(11, 16));
+    values = data.map(d => d.duration);
+  } else {
+    labels = data.map(d => d.week.slice(5));
+    values = data.map(d => d.duration);
+  }
 
-    console.log(`Bar ${index}: x=${x}, y=${y}, width=${fixedBarWidth}, height=${barHeight}`);
-
-    const gradient = ctx.createLinearGradient(0, y, 0, height - padding);
-    gradient.addColorStop(0, '#667eea');
-    gradient.addColorStop(1, '#764ba2');
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, y, fixedBarWidth, barHeight);
-
-    ctx.fillStyle = '#ffd700';
-    ctx.font = '12px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(item.date.slice(5), x + fixedBarWidth / 2, height - 10);
-
-    const hours = Math.floor(item.duration / 3600);
-    const minutes = Math.floor((item.duration % 3600) / 60);
-    ctx.fillText(`${hours}h${minutes}m`, x + fixedBarWidth / 2, y - 5);
+  chartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: gradient,
+        borderWidth: 0,
+        barThickness: 40
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (context) => formatDuration(context.parsed.y)
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#b0b0b0',
+            callback: (value) => formatDuration(value)
+          },
+          grid: { color: 'rgba(255, 255, 255, 0.05)' }
+        },
+        x: {
+          ticks: { color: '#b0b0b0' },
+          grid: { display: false }
+        }
+      }
+    }
   });
 }
 
-window.addEventListener('DOMContentLoaded', loadHistory);
+function formatDuration(seconds) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+}
+
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    loadChart(tab.dataset.view);
+  });
+});
+
+window.addEventListener('DOMContentLoaded', () => loadChart('daily'));
