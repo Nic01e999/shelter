@@ -72,6 +72,7 @@ body {
 }
 
 #panel-control {
+  max-height: 5rem;
   display: grid;
   gap: 5px;
   grid-template-columns: 1fr 1fr;

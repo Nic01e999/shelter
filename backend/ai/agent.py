@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 import platform
 
-from prompt_template import react_system_prompt_template
+from ai.ai.prompt_template import react_system_prompt_template
 
 
 class ReActAgent:

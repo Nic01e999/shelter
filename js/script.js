@@ -3,6 +3,8 @@ const radius = 300;
 const centerX = 300;
 const centerY = 300;
 let selectedItem = null;
+let currentUserId = 1; // 默认用户ID
+let todos = [];
 
 function setPosition(item, angle) {
   const rad = (angle * Math.PI) / 180;
@@ -13,11 +15,46 @@ function setPosition(item, angle) {
   item.dataset.angle = angle;
 }
 
-function initItems() {
-  document.querySelectorAll('.item').forEach(item => {
-    setPosition(item, parseFloat(item.dataset.angle));
+async function loadTodos() {
+  todos = await api.getTodos(currentUserId);
+  container.querySelectorAll('.item').forEach(item => item.remove());
+  todos.forEach(todo => {
+    const item = document.createElement('div');
+    item.className = 'item';
+    item.dataset.todoId = todo.id;
+    item.dataset.angle = todo.position_angle;
+    item.textContent = todo.title;
+    container.appendChild(item);
+    setPosition(item, todo.position_angle);
     item.addEventListener('click', () => selectItem(item));
   });
+}
+
+async function saveTodo(item) {
+  const todoId = item.dataset.todoId;
+  const title = item.textContent;
+  const angle = parseFloat(item.dataset.angle);
+  const tasks = getTodoTasks();
+
+  if (todoId) {
+    await api.updateTodo(todoId, title, angle, tasks);
+  } else {
+    const result = await api.createTodo(currentUserId, title, angle, tasks);
+    item.dataset.todoId = result.id;
+  }
+}
+
+function getTodoTasks() {
+  const tasks = [];
+  document.querySelectorAll('.todo-item').forEach(item => {
+    const text = item.querySelector('.todo-input').textContent.trim();
+    if (text) tasks.push(text);
+  });
+  return tasks;
+}
+
+function initItems() {
+  loadTodos();
 }
 
 function selectItem(item) {
@@ -30,18 +67,23 @@ function selectItem(item) {
 initItems();
 
 document.getElementById('itemText').addEventListener('input', (e) => {
-  if (selectedItem) selectedItem.textContent = e.target.value;
+  if (selectedItem) {
+    selectedItem.textContent = e.target.value;
+    saveTodo(selectedItem);
+  }
 });
 
-document.getElementById('deleteBtn').addEventListener('click', () => {
+document.getElementById('deleteBtn').addEventListener('click', async () => {
   if (selectedItem) {
+    const todoId = selectedItem.dataset.todoId;
+    if (todoId) await api.deleteTodo(todoId);
     selectedItem.remove();
     selectedItem = null;
     document.getElementById('itemText').value = '';
   }
 });
 
-document.getElementById('addBtn').addEventListener('click', () => {
+document.getElementById('addBtn').addEventListener('click', async () => {
   const item = document.createElement('div');
   item.className = 'item';
   item.dataset.angle = '0';
@@ -49,6 +91,7 @@ document.getElementById('addBtn').addEventListener('click', () => {
   container.appendChild(item);
   setPosition(item, 0);
   item.addEventListener('click', () => selectItem(item));
+  await saveTodo(item);
 });
 
 let dragging = null;
@@ -77,6 +120,7 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', () => {
   if (dragging) {
     dragging.classList.remove('dragging');
+    saveTodo(dragging);
     dragging = null;
   }
 });
