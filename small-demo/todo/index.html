@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Todo List Manager</h1>
+            <p class="subtitle">Manage your tasks efficiently</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <input type="text" id="todoInput" placeholder="Add a new task..." autocomplete="off">
+                <button id="addBtn"><i class="fas fa-plus"></i> Add Task</button>
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+            </div>
+            
+            <div class="todo-list-container">
+                <ul id="todoList">
+                    <!-- Todo items will be added here dynamically -->
+                </ul>
+                
+                <div class="empty-state" id="emptyState">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No tasks yet</h3>
+                    <p>Add a task to get started!</p>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total:</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Pending:</span>
+                    <span class="stat-value" id="pendingCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Completed:</span>
+                    <span class="stat-value" id="completedCount">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Todo List Manager &copy; 2023 | Simple CRUD application</p>
+        </footer>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
