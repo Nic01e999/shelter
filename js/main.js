@@ -7,6 +7,13 @@ import './drag.js';
 loadProjects();
 initModefire();
 
+// 宠物聊天窗口切换
+const petImg = document.getElementById('petImg');
+const chatWindow = document.getElementById('chat-window');
+petImg.addEventListener('click', () => {
+  chatWindow.style.display = chatWindow.style.display === 'none' || chatWindow.style.display === '' ? 'block' : 'none';
+});
+
 // 项目标题编辑
 document.getElementById('itemText').addEventListener('input', (e) => {
   const selected = getSelectedItem();
