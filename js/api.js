@@ -15,13 +15,13 @@ const api = {
     return res.json();
   },
 
-  async getTodos(userId) {
-    const res = await fetch(`${API_BASE}/todos/${userId}`);
+  async getProjects(userId) {
+    const res = await fetch(`${API_BASE}/projects/${userId}`);
     return res.json();
   },
 
-  async createTodo(userId, title, angle, tasks) {
-    const res = await fetch(`${API_BASE}/todos`, {
+  async createProject(userId, title, angle, tasks) {
+    const res = await fetch(`${API_BASE}/projects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, title, position_angle: angle, tasks })
@@ -29,8 +29,8 @@ const api = {
     return res.json();
   },
 
-  async updateTodo(todoId, title, angle, tasks) {
-    const res = await fetch(`${API_BASE}/todos/${todoId}`, {
+  async updateProject(projectId, title, angle, tasks) {
+    const res = await fetch(`${API_BASE}/projects/${projectId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, position_angle: angle, tasks })
@@ -38,8 +38,8 @@ const api = {
     return res.json();
   },
 
-  async deleteTodo(todoId) {
-    const res = await fetch(`${API_BASE}/todos/${todoId}`, {
+  async deleteProject(projectId) {
+    const res = await fetch(`${API_BASE}/projects/${projectId}`, {
       method: 'DELETE'
     });
     return res.json();

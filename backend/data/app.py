@@ -38,23 +38,23 @@ def create_user():
     conn.close()
     return jsonify({'id': user_id, 'username': data['username']}), 201
 
-# 待办清单相关接口
-@app.route('/api/todos/<int:user_id>', methods=['GET'])
-def get_todos(user_id):
+# 项目相关接口（圆形轨道上的项目）
+@app.route('/api/projects/<int:user_id>', methods=['GET'])
+def get_projects(user_id):
     conn = get_db()
-    todos = conn.execute(
+    projects = conn.execute(
         'SELECT * FROM todo_lists WHERE user_id = ?', (user_id,)
     ).fetchall()
     conn.close()
     result = []
-    for todo in todos:
-        item = dict(todo)
+    for project in projects:
+        item = dict(project)
         item['tasks'] = json.loads(item['tasks'])
         result.append(item)
     return jsonify(result)
 
-@app.route('/api/todos', methods=['POST'])
-def create_todo():
+@app.route('/api/projects', methods=['POST'])
+def create_project():
     data = request.json
     conn = get_db()
     cursor = conn.execute(
@@ -62,26 +62,26 @@ def create_todo():
         (data['user_id'], data['title'], data['position_angle'], json.dumps(data.get('tasks', [])))
     )
     conn.commit()
-    todo_id = cursor.lastrowid
+    project_id = cursor.lastrowid
     conn.close()
-    return jsonify({'id': todo_id}), 201
+    return jsonify({'id': project_id}), 201
 
-@app.route('/api/todos/<int:todo_id>', methods=['PUT'])
-def update_todo(todo_id):
+@app.route('/api/projects/<int:project_id>', methods=['PUT'])
+def update_project(project_id):
     data = request.json
     conn = get_db()
     conn.execute(
         'UPDATE todo_lists SET title = ?, position_angle = ?, tasks = ?, updated_at = ? WHERE id = ?',
-        (data['title'], data['position_angle'], json.dumps(data['tasks']), datetime.now(), todo_id)
+        (data['title'], data['position_angle'], json.dumps(data['tasks']), datetime.now(), project_id)
     )
     conn.commit()
     conn.close()
     return jsonify({'success': True})
 
-@app.route('/api/todos/<int:todo_id>', methods=['DELETE'])
-def delete_todo(todo_id):
+@app.route('/api/projects/<int:project_id>', methods=['DELETE'])
+def delete_project(project_id):
     conn = get_db()
-    conn.execute('DELETE FROM todo_lists WHERE id = ?', (todo_id,))
+    conn.execute('DELETE FROM todo_lists WHERE id = ?', (project_id,))
     conn.commit()
     conn.close()
     return jsonify({'success': True})
