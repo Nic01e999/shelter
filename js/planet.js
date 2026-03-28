@@ -1,7 +1,7 @@
 const planets = [
-  { name: 'earth', image: 'access/image/earth.PNG' },
-  { name: 'saturn', image: 'access/image/saturn.PNG' },
-  { name: 'mars', image: 'access/image/mars.PNG' },
+  { name: 'earth', image: 'access/image/planets/earth.PNG' },
+  { name: 'saturn', image: 'access/image/planets/saturn.PNG' },
+  { name: 'mars', image: 'access/image/planets/mars.PNG' },
 ];
 
 let currentPlanetIndex = 0;
