@@ -14,19 +14,21 @@ def ai_chat():
     project_id = data.get('project_id')
     message = data.get('message')
     role = data.get('role', 'psychology')
+    history = data.get('history', [])
 
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'ai'))
     from service import AIService
 
     try:
         ai_service = AIService(user_id, project_id)
-        result = ai_service.chat(message, role)
+        result = ai_service.chat(message, role, history)
 
         if isinstance(result, dict):
             return jsonify({
                 'success': True,
                 'response': result['response'],
-                'todolist_updated': result.get('todolist_updated', False)
+                'todolist_updated': result.get('todolist_updated', False),
+                'project_created': result.get('project_created', False)
             })
         else:
             return jsonify({

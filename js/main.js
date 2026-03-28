@@ -24,6 +24,7 @@ async function checkAuth() {
 checkAuth();
 
 // 主入口文件
+import api from './api.js';
 import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition, currentUserId } from './circle.js';
 import { initModefire } from './modefire.js';
 import { initAudio, togglePlay, changeSound, setVolume } from './audio.js';
@@ -118,6 +119,7 @@ document.getElementById('deleteBtn').addEventListener('click', async () => {
     selected.remove();
     setSelectedItem(null);
     document.getElementById('itemText').value = '';
+    document.getElementById('panel-display').classList.add('hidden');
     loadProjectTasks([]);
     updateButtonStates();
   }
