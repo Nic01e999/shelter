@@ -31,5 +31,3 @@ document.addEventListener('mouseup', () => {
     dragging = null;
   }
 });
-
-export { dragging };

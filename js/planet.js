@@ -1,19 +1,20 @@
 const planets = [
-  { name: 'earth', image: 'access/image/earth.PNG' },
-  { name: 'moon', image: 'access/image/saturn.PNG' },
-  { name: 'mars', image: 'access/image/mars.PNG' },
+  { name: 'earth', image: 'access/image/planets/earth.PNG' },
+  { name: 'saturn', image: 'access/image/planets/saturn.PNG' },
+  { name: 'mars', image: 'access/image/planets/mars.PNG' },
 ];
 
 let currentPlanetIndex = 0;
-let planetLongPressTimer = null;
 
-// 等待 DOM 加载完成
 document.addEventListener('DOMContentLoaded', () => {
   const planetContainer = document.querySelector('.planet-container');
   const planetImage = document.querySelector('.planet-image');
   const menu = document.querySelector('.planet-menu');
 
   if (!planetContainer || !planetImage || !menu) return;
+
+  let planetLongPressTimer = null;
+  planetContainer.style.cursor = 'pointer';
 
 // 生成菜单
 menu.innerHTML = planets.map((planet, i) =>

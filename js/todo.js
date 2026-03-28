@@ -28,7 +28,14 @@ function createTodoItem() {
     saveTimeout = setTimeout(() => {
       const selected = getSelectedItem();
       if (selected) saveProject(selected, true);
-    }, 500);
+    }, 300);
+  });
+
+  input.addEventListener('blur', () => {
+    if (isLoading) return;
+    clearTimeout(saveTimeout);
+    const selected = getSelectedItem();
+    if (selected) saveProject(selected, true);
   });
 
   input.addEventListener('keydown', (e) => {

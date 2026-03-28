@@ -1,8 +1,8 @@
 // 小动物切换模块
 const pets = [
-  { name: 'cat', layers: ['access/image/cat.png', 'access/image/cat1.PNG', 'access/image/cat2.PNG', 'access/image/cat3.PNG'] },
-  { name: 'dog', layers: ['access/image/dog.png', 'access/image/dog1.PNG', 'access/image/dog2.PNG', 'access/image/dog3.PNG'] },
-  { name: 'spider', layers: ['access/image/spider.png', 'access/image/spider1.PNG', 'access/image/spider2.PNG', 'access/image/spider3.PNG'] }
+  { name: 'cat', layers: ['access/image/cat.png', 'access/image/pets/cat1.PNG', 'access/image/pets/cat2.PNG', 'access/image/pets/cat3.PNG'] },
+  { name: 'dog', layers: ['access/image/dog.png', 'access/image/pets/dog1.PNG', 'access/image/pets/dog2.PNG', 'access/image/pets/dog3.PNG'] },
+  { name: 'spider', layers: ['access/image/spider.png', 'access/image/pets/spider1.PNG', 'access/image/pets/spider2.PNG', 'access/image/pets/spider3.PNG'] }
 ];
 
 let currentPetIndex = 0;

@@ -294,12 +294,11 @@ def list_projects(user_id: int = 1) -> str:
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
     from database import get_db
 
-    conn = get_db()
-    projects = conn.execute(
-        'SELECT id, title, tasks FROM todo_lists WHERE user_id = ?',
-        (user_id,)
-    ).fetchall()
-    conn.close()
+    with get_db() as conn:
+        projects = conn.execute(
+            'SELECT id, title, tasks FROM todo_lists WHERE user_id = ?',
+            (user_id,)
+        ).fetchall()
 
     if not projects:
         return "用户暂无项目"
@@ -320,17 +319,16 @@ def create_project(title: str, user_id: int = 1) -> str:
     sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
     from database import get_db
 
-    # 固定在左上角位置（135度）
-    angle = 135
+    # 固定在左上角位置（225度）
+    angle = 225
 
-    conn = get_db()
-    cursor = conn.execute(
-        'INSERT INTO todo_lists (user_id, title, position_angle, tasks) VALUES (?, ?, ?, ?)',
-        (user_id, title, angle, json.dumps([]))
-    )
-    conn.commit()
-    project_id = cursor.lastrowid
-    conn.close()
+    with get_db() as conn:
+        cursor = conn.execute(
+            'INSERT INTO todo_lists (user_id, title, position_angle, tasks) VALUES (?, ?, ?, ?)',
+            (user_id, title, angle, json.dumps([]))
+        )
+        conn.commit()
+        project_id = cursor.lastrowid
 
     return f"已创建项目 '{title}'（ID: {project_id}）"
 

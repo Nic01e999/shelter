@@ -1,4 +1,5 @@
 import api from './api.js';
+import CONFIG from './config.js';
 
 let chartInstance = null;
 let currentView = 'daily';
@@ -11,10 +12,10 @@ async function loadChart(view) {
     if (view === 'daily') {
       data = await api.getFocusHistory(7);
     } else if (view === 'hourly') {
-      const response = await fetch('http://localhost:9999/api/modefire/history/hourly?hours=24');
+      const response = await fetch(`${CONFIG.API_BASE}/modefire/history/hourly?hours=24`);
       data = await response.json();
     } else if (view === 'weekly') {
-      const response = await fetch('http://localhost:9999/api/modefire/history/weekly?weeks=12');
+      const response = await fetch(`${CONFIG.API_BASE}/modefire/history/weekly?weeks=12`);
       data = await response.json();
     }
 
