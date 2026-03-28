@@ -3,11 +3,8 @@ import sys
 from functools import partial
 
 sys.path.insert(0, os.path.dirname(__file__))
-from agent import ReActAgent, talk, websearch, task_breaker, read_file, write_to_file
+from agent import ReActAgent, talk, websearch, task_breaker, list_projects, create_project
 from tools import update_todolist
-
-# 全局会话历史存储 {(user_id, project_id, role): messages}
-_session_history = {}
 
 class AIService:
     def __init__(self, user_id: int, project_id: int = None, project_directory: str = None):
@@ -15,20 +12,15 @@ class AIService:
         self.project_id = project_id
         self.project_directory = project_directory or os.getcwd()
 
-    def chat(self, message: str, role: str = 'psychology') -> str:
+    def chat(self, message: str, role: str = 'psychology', history: list = None) -> str:
         """处理用户消息"""
         if role == 'psychology':
-            tools = [talk, websearch, task_breaker, read_file, write_to_file]
+            tools = [talk, websearch, list_projects, create_project, task_breaker]
         else:
             # taskbreaker 角色，绑定 project_id 到 update_todolist
             bound_update = partial(update_todolist, self.project_id)
             bound_update.__name__ = 'up_todolist'
-            tools = [talk, bound_update, read_file, write_to_file]
-
-        # 获取或创建会话历史
-        session_key = (self.user_id, self.project_id, role)
-        if session_key not in _session_history:
-            _session_history[session_key] = []
+            tools = [talk, bound_update]
 
         agent = ReActAgent(
             tools=tools,
@@ -37,9 +29,14 @@ class AIService:
             role=role
         )
 
-        response = agent.run(message, history=_session_history[session_key])
+        response = agent.run(message, history=history or [])
 
-        # 检查是否更新了待办清单
-        updated_todolist = role == 'taskbreaker' and 'up_todolist' in str(_session_history[session_key][-5:])
+        # 检查是否更新了待办清单或创建了项目
+        updated_todolist = role == 'taskbreaker' and 'up_todolist' in response
+        created_project = 'create_project' in agent.called_tools
 
-        return {'response': response, 'todolist_updated': updated_todolist}
+        return {
+            'response': response,
+            'todolist_updated': updated_todolist,
+            'project_created': created_project
+        }

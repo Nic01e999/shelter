@@ -1,8 +1,8 @@
 // 小动物切换模块
 const pets = [
-  { name: 'cat', layers: ['access/image/cat1.PNG', 'access/image/cat2.PNG', 'access/image/cat3.PNG'] },
-  { name: 'dog', layers: ['access/image/dog1.PNG', 'access/image/dog2.PNG', 'access/image/dog3.PNG'] },
-  { name: 'spider', layers: ['access/image/spider1.PNG', 'access/image/spider2.PNG', 'access/image/spider3.PNG'] }
+  { name: 'cat', layers: ['access/image/cat.png', 'access/image/cat1.PNG', 'access/image/cat2.PNG', 'access/image/cat3.PNG'] },
+  { name: 'dog', layers: ['access/image/dog.png', 'access/image/dog1.PNG', 'access/image/dog2.PNG', 'access/image/dog3.PNG'] },
+  { name: 'spider', layers: ['access/image/spider.png', 'access/image/spider1.PNG', 'access/image/spider2.PNG', 'access/image/spider3.PNG'] }
 ];
 
 let currentPetIndex = 0;
@@ -58,6 +58,7 @@ menu.addEventListener('click', (e) => {
     layers[0].src = pets[currentPetIndex].layers[0];
     layers[1].src = pets[currentPetIndex].layers[1];
     layers[2].src = pets[currentPetIndex].layers[2];
+    layers[3].src = pets[currentPetIndex].layers[3];
     localStorage.setItem('selectedPet', currentPetIndex);
     menu.classList.remove('show');
   }
@@ -78,4 +79,5 @@ if (saved !== null) {
   layers[0].src = pets[currentPetIndex].layers[0];
   layers[1].src = pets[currentPetIndex].layers[1];
   layers[2].src = pets[currentPetIndex].layers[2];
+  layers[3].src = pets[currentPetIndex].layers[3];
 }

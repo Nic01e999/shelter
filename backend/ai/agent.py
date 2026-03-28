@@ -19,6 +19,7 @@ class ReActAgent:
         self.model = model
         self.project_directory = project_directory
         self.role = role
+        self.called_tools = []  # 记录调用过的工具
         self.client = OpenAI(
             base_url="https://api.deepseek.com",
             api_key=ReActAgent.get_api_key(),
@@ -71,8 +72,18 @@ class ReActAgent:
                         "content": "<observation>错误：你必须输出 <action> 或 <final_answer> 标签。请严格按照格式重新回答。</observation>"
                     })
                     continue
-            action = action_match.group(1)
-            tool_name, args = self.parse_action(action)
+            action = action_match.group(1).strip()
+
+            try:
+                tool_name, args = self.parse_action(action)
+            except ValueError as e:
+                print(f"⚠️ 解析 action 失败：{e}")
+                print(f"   原始内容：{action[:100]}...")
+                messages.append({
+                    "role": "user",
+                    "content": f"<observation>错误：action 格式不正确。必须是 函数名(参数) 的格式，例如 talk(\"消息内容\") 或 up_todolist([\"任务1\", \"任务2\"])。你的输出：{action[:100]}</observation>"
+                })
+                continue
 
             print(f"\n\n🔧 Action: {tool_name}()")
             print(f"   参数: {args}")
@@ -92,9 +103,14 @@ class ReActAgent:
                     return f"错误：{str(e)}"
 
             try:
+                print(f"🔍 调用工具: {tool_name}")
+                print(f"🔍 参数类型: {[type(arg).__name__ for arg in args]}")
+                print(f"🔍 参数值: {args}")
+                self.called_tools.append(tool_name)  # 记录工具调用
                 observation = self.tools[tool_name](*args)
             except Exception as e:
-                observation = f"工具执行错误：{str(e)}"
+                error_msg = str(e)
+                observation = f"工具执行错误：{error_msg}\n\n你的调用：{tool_name}({args})\n正确格式示例：\n- talk(\"消息内容\")\n- up_todolist([\"任务1\", \"任务2\", \"任务3\"])\n- websearch(\"搜索关键词\")\n- list_projects()\n- create_project(\"项目名称\")\n- task_breaker(\"任务描述\", 项目ID)"
             print(f"\n\n🔍 Observation：{observation}")
             obs_msg = f"<observation>{observation}</observation>"
             messages.append({"role": "user", "content": obs_msg})
@@ -140,6 +156,12 @@ class ReActAgent:
             messages=messages,
         )
         content = response.choices[0].message.content
+
+        # 处理空响应
+        if not content or content.strip() == "":
+            print("⚠️ 警告：模型返回了空内容")
+            content = "<thought>我需要重新思考并给出回复。</thought>\n<action>talk(\"抱歉，我需要重新组织一下思路。\")</action>"
+
         # print(f"\n\n📝 模型原始输出：\n{content}")
         messages.append({"role": "assistant", "content": content})
         return content
@@ -264,6 +286,54 @@ def up_todolist(items: list) -> str:
     # 这个函数会被包装，实际调用时 project_id 已经绑定
     raise NotImplementedError("此函数需要通过 service.py 中的 partial 绑定 project_id 后使用")
 
+def list_projects(user_id: int = 1) -> str:
+    """查看用户所有项目，参数: user_id (int) - 用户ID（默认1）"""
+    import sys
+    import os
+    import json
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from database import get_db
+
+    conn = get_db()
+    projects = conn.execute(
+        'SELECT id, title, tasks FROM todo_lists WHERE user_id = ?',
+        (user_id,)
+    ).fetchall()
+    conn.close()
+
+    if not projects:
+        return "用户暂无项目"
+
+    result = []
+    for p in projects:
+        tasks = json.loads(p['tasks'])
+        task_count = len(tasks)
+        result.append(f"- {p['title']} (ID: {p['id']}, {task_count}个任务)")
+
+    return "用户的项目列表：\n" + "\n".join(result)
+
+def create_project(title: str, user_id: int = 1) -> str:
+    """创建新项目，参数: title (str) - 项目标题, user_id (int) - 用户ID（默认1）"""
+    import sys
+    import os
+    import json
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from database import get_db
+
+    # 固定在左上角位置（135度）
+    angle = 135
+
+    conn = get_db()
+    cursor = conn.execute(
+        'INSERT INTO todo_lists (user_id, title, position_angle, tasks) VALUES (?, ?, ?, ?)',
+        (user_id, title, angle, json.dumps([]))
+    )
+    conn.commit()
+    project_id = cursor.lastrowid
+    conn.close()
+
+    return f"已创建项目 '{title}'（ID: {project_id}）"
+
 def task_breaker(task: str, project_id: int) -> str:
     """调用任务拆解助手"""
     import sys
@@ -297,9 +367,9 @@ def main(role, project_directory):
 
     # 根据角色选择工具集
     if role == 'psychology':
-        tools = [talk, websearch, task_breaker, read_file, write_to_file]
+        tools = [talk, websearch, list_projects, create_project, task_breaker]
     else:  # taskbreaker
-        tools = [talk, up_todolist, read_file, write_to_file]
+        tools = [talk, up_todolist]
 
     agent = ReActAgent(tools=tools, model="deepseek-chat", project_directory=project_dir, role=role)
 

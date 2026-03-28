@@ -1,3 +1,5 @@
+import api from './api.js';
+
 let chartInstance = null;
 let currentView = 'daily';
 

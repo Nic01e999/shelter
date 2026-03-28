@@ -1,15 +1,15 @@
 .pet {
   position: fixed;
-  left: 0%;
-  bottom: 25%;
+  left: 3%;
+  bottom: 5%;
   z-index: 100001;
   cursor: pointer;
 }
 
 .pet-layers {
   position: relative;
-  width: 17rem;
-  height: 17rem;
+  width: 25rem;
+  height: 25rem;
   animation: petFloat 3s ease-in-out infinite;
 }
 
@@ -19,8 +19,8 @@
 
 .pet-layer {
   position: absolute;
-  width: 200%;
-  height: 200%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }
 
@@ -44,7 +44,7 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(5px);
-  z-index: 99999;
+  z-index: 100001;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -64,7 +64,7 @@
   transform: translateX(-50%);
   width: 50vh;
   height: 100vh;
-  z-index: 100000;
+  z-index: 100002;
   display: none;
   flex-direction: column;
   padding: 20px;

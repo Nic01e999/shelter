@@ -1,3 +1,5 @@
+import api from './api.js';
+
 let timerInterval = null;
 let startTime = null;
 
@@ -21,7 +23,6 @@ async function toggleFocus() {
     localStorage.removeItem('focusStartTime');
     stopTimer();
     btn.classList.remove('active');
-    loadHistory();
   } else {
     startTime = new Date().toISOString();
     localStorage.setItem('focusStartTime', startTime);

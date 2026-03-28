@@ -3,6 +3,7 @@ import { saveProject, getSelectedItem } from './circle.js';
 
 const todoList = document.getElementById('todoList');
 let saveTimeout;
+let isLoading = false;
 
 function createTodoItem() {
   const item = document.createElement('div');
@@ -22,6 +23,7 @@ function createTodoItem() {
   input.setAttribute('data-placeholder', '待办事项');
 
   input.addEventListener('input', () => {
+    if (isLoading) return;
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
       const selected = getSelectedItem();
@@ -64,6 +66,7 @@ function getProjectTasks() {
 }
 
 function loadProjectTasks(tasks) {
+  isLoading = true;
   todoList.innerHTML = '';
   if (tasks.length === 0) {
     tasks = [{ text: '', completed: false }];
@@ -74,6 +77,7 @@ function loadProjectTasks(tasks) {
     item.querySelector('.todo-checkbox').checked = task.completed;
     todoList.appendChild(item);
   });
+  setTimeout(() => isLoading = false, 100);
 }
 
 export { createTodoItem, getProjectTasks, loadProjectTasks };

@@ -16,10 +16,6 @@ body {
 
   background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
   gap: 20px;
-  background-image: url("../access/image/back.PNG");
-  background-size: auto 100%;
-  background-position: center;
-  background-repeat: no-repeat;
 
   /* 去掉默认边距 */
   margin: 0;

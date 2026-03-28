@@ -1,4 +1,6 @@
 // 圆形轨道系统
+import api from './api.js';
+
 const container = document.querySelector('.container');
 const radius = 350;
 const centerX = 350;
@@ -68,17 +70,7 @@ async function selectItem(item, project) {
   document.getElementById('itemText').value = item.textContent;
   document.getElementById('panel-display').classList.remove('hidden');
 
-  const projectId = item.dataset.projectId;
-  if (projectId) {
-    const projects = await api.getProjects(currentUserId);
-    const latestProject = projects.find(p => p.id == projectId);
-    if (latestProject) {
-      loadProjectTasks(latestProject.tasks || []);
-    }
-  } else {
-    loadProjectTasks([]);
-  }
-
+  loadProjectTasks(project?.tasks || []);
   updateButtonStates();
 }
 

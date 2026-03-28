@@ -1,5 +1,17 @@
 import CONFIG from './config.js';
 
+// 会话历史存储（页面刷新后清空）
+const chatHistory = new Map();
+
+// 轻量 Markdown 格式化
+function formatMarkdown(text) {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
 /**
  * 统一的聊天处理函数
  * @param {Object} options - 配置选项
@@ -13,6 +25,13 @@ import CONFIG from './config.js';
  */
 export async function sendChatMessage(options) {
   const { message, role, messagesContainer, inputElement, userId, projectId, onSuccess } = options;
+
+  // 获取或创建会话历史
+  const sessionKey = `${userId}_${projectId}_${role}`;
+  if (!chatHistory.has(sessionKey)) {
+    chatHistory.set(sessionKey, []);
+  }
+  const history = chatHistory.get(sessionKey);
 
   if (!message.trim()) return;
 
@@ -38,21 +57,36 @@ export async function sendChatMessage(options) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('authToken')}`
       },
-      body: JSON.stringify({ user_id: userId, project_id: projectId, message, role })
+      body: JSON.stringify({ user_id: userId, project_id: projectId, message, role, history })
     });
 
     const data = await response.json();
+    console.log('📨 AI 响应数据:', data);
+    console.log('🔍 project_created 标志:', data.project_created);
     typingIndicator.remove();
 
     if (data.success) {
+      // 更新会话历史
+      history.push({ role: 'user', content: message });
+      history.push({ role: 'assistant', content: data.response });
+
       const aiMsg = document.createElement('div');
       aiMsg.className = 'chat-message ai-message';
-      aiMsg.innerHTML = marked.parse(data.response);
+      aiMsg.innerHTML = formatMarkdown(data.response);
       messagesContainer.appendChild(aiMsg);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
+      // 如果创建了项目，刷新项目列表
+      if (data.project_created) {
+        console.log('✅ 检测到项目创建，刷新项目列表');
+        const { loadProjects } = await import('./circle.js');
+        await loadProjects();
+      }
+
       // 如果更新了待办清单，执行回调
+      console.log('🔔 todolist_updated:', data.todolist_updated, 'onSuccess:', !!onSuccess);
       if (data.todolist_updated && onSuccess) {
+        console.log('✅ 调用 onSuccess 回调');
         await onSuccess();
       }
     } else {
