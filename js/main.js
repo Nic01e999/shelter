@@ -138,9 +138,14 @@ document.getElementById('addBtn').addEventListener('click', async () => {
 });
 
 // 白噪音控制
-document.getElementById('audio-toggle').addEventListener('click', () => {
+const audioBtn = document.getElementById('audio-toggle');
+audioBtn.addEventListener('click', () => {
   const isPlaying = togglePlay();
-  document.getElementById('audio-toggle').textContent = isPlaying ? '⏸️ Pause' : '▶️ Play';
+  if (isPlaying) {
+    audioBtn.classList.add('playing');
+  } else {
+    audioBtn.classList.remove('playing');
+  }
 });
 
 document.getElementById('audio-source').addEventListener('change', (e) => {
