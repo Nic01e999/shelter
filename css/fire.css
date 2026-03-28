@@ -19,7 +19,7 @@
 
 #panel-modefire:hover {
   background: rgba(30, 30, 30, 0.8);
-  border-color: rgba(255, 154, 86, 0.3);
+  border-color: rgba(45, 222, 253, 0.3);
 }
 
 #panel-modefire:active {
@@ -27,7 +27,7 @@
 }
 
 .fire-btn {
-  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
+  background: linear-gradient(135deg, #2ddefd 0%, #1ca3d6 100%);
   border: none;
   padding: 15px 25px;
   border-radius: 8px;
@@ -35,12 +35,12 @@
   cursor: pointer;
   font-size: 24px;
   transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(255, 154, 86, 0.2);
+  box-shadow: 0 4px 15px rgba(45, 222, 253, 0.2);
 }
 
 .fire-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 154, 86, 0.3);
+  box-shadow: 0 6px 20px rgba(45, 222, 253, 0.3);
 }
 
 .fire-btn.active {
@@ -50,7 +50,7 @@
 
 #fire-timer {
   font-size: 24px;
-  color: #ff9a56;
+  color: #2ddefd;
   font-family: monospace;
 }
 
@@ -81,7 +81,7 @@
 
 .fire-timer-link {
   font-size: 24px;
-  color: #ff9a56;
+  color: #2ddefd;
   font-family: monospace;
   text-decoration: none;
   cursor: pointer;
@@ -90,7 +90,7 @@
 
 .fire-timer-link:hover {
   color: #fff;
-  text-shadow: 0 0 10px #ff9a56;
+  text-shadow: 0 0 10px #2ddefd;
 }
 
 .back-link {

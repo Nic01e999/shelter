@@ -45,10 +45,17 @@ initAudio();
 updateButtonStates();
 
 // 宠物聊天窗口切换
-const petImg = document.getElementById('petImg');
+const petLayers = document.querySelector('.pet-layers');
 const chatWindow = document.getElementById('chat-window');
-petImg.addEventListener('click', () => {
-  chatWindow.style.display = chatWindow.style.display === 'none' || chatWindow.style.display === '' ? 'flex' : 'none';
+const chatOverlay = document.getElementById('chat-overlay');
+petLayers.addEventListener('click', () => {
+  // 添加弹跳动画
+  petLayers.classList.add('bounce');
+  setTimeout(() => petLayers.classList.remove('bounce'), 500);
+
+  const isVisible = chatWindow.style.display === 'flex';
+  chatWindow.style.display = isVisible ? 'none' : 'flex';
+  chatOverlay.classList.toggle('show', !isVisible);
 });
 
 // 心理老师聊天
@@ -231,6 +238,7 @@ document.addEventListener('click', async (e) => {
     }
     if (chatWindow.style.display === 'flex') {
       chatWindow.style.display = 'none';
+      chatOverlay.classList.remove('show');
     }
     if (tbWindow.style.display === 'flex') {
       tbWindow.style.display = 'none';

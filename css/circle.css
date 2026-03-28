@@ -29,7 +29,7 @@
 
 .item:hover {
   background: rgba(45, 45, 45, 0.8);
-  border-color: rgba(255, 154, 86, 0.3);
+  border-color: rgba(45, 222, 253, 0.3);
   transform: translateY(-2px);
 }
 
@@ -44,6 +44,6 @@
 }
 
 .item.selected {
-  border: 2px solid #ff9a56;
-  box-shadow: 0 0 20px rgba(255, 154, 86, 0.4);
+  border: 2px solid #2ddefd;
+  box-shadow: 0 0 20px rgba(45, 222, 253, 0.4);
 }
