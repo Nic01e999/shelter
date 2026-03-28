@@ -71,7 +71,7 @@ async function sendMessage() {
     if (response.success) {
       const aiMsg = document.createElement('div');
       aiMsg.className = 'chat-message ai-message';
-      aiMsg.textContent = response.response;
+      aiMsg.innerHTML = response.response.replace(/\n/g, '<br>');
       chatMessages.appendChild(aiMsg);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
