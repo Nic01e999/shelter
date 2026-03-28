@@ -1,56 +1,34 @@
-// 认证检查
-const token = localStorage.getItem('authToken');
-const userId = localStorage.getItem('userId');
-
-if (!token || !userId) {
-  window.location.href = '/login.html';
-}
-
-async function checkAuth() {
-  try {
-    const res = await fetch('http://localhost:9999/api/auth/me', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!res.ok) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userId');
-      window.location.href = '/login.html';
-    }
-  } catch (err) {
-    console.error('认证检查失败:', err);
-  }
-}
-
-checkAuth();
-
 // 主入口文件
 import api from './api.js';
 import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition, currentUserId } from './circle.js';
+import { loadProjectTasks, getProjectTasks } from './todo.js';
 import { initModefire } from './modefire.js';
-import { initAudio, togglePlay, changeSound, setVolume } from './audio.js';
+import { initAudio, togglePlay, changeSound } from './audio.js';
 import { sendChatMessage } from './chat.js';
 import CONFIG from './config.js';
 import './drag.js';
 
-// 更新按钮状态
+/**
+ * 更新按钮状态
+ * @returns {void}
+ */
 export function updateButtonStates() {
   const hasSelection = !!getSelectedItem();
   document.getElementById('deleteBtn').disabled = !hasSelection;
   document.getElementById('task-break').disabled = !hasSelection;
 }
 
-// 刷新项目数据
+/**
+ * 刷新项目数据
+ * @param {number} projectId - 项目ID
+ * @returns {Promise<void>}
+ */
 async function refreshProjectData(projectId) {
-  console.log('🔄 refreshProjectData 被调用, projectId:', projectId);
-  const api = await import('./api.js');
   await loadProjects();
   const item = document.querySelector(`[data-project-id="${projectId}"]`);
-  console.log('🔍 找到的 item:', item);
   if (item) {
-    const projects = await api.default.getProjects(currentUserId);
-    console.log('📦 获取到的 projects:', projects);
+    const projects = await api.getProjects(currentUserId);
     const project = projects.find(p => p.id == projectId);
-    console.log('🎯 匹配的 project:', project);
     if (project) await selectItem(item, project);
   }
 }
@@ -80,6 +58,10 @@ const chatInput = document.querySelector('.chat-input');
 const chatSendBtn = document.querySelector('.chat-send-btn');
 const chatMessages = document.querySelector('.chat-messages');
 
+/**
+ * 发送心理咨询消息
+ * @returns {Promise<void>}
+ */
 async function sendPsychologyMessage() {
   const selected = getSelectedItem();
   const projectId = selected?.dataset.projectId;
@@ -113,7 +95,6 @@ document.getElementById('itemText').addEventListener('input', (e) => {
 document.getElementById('deleteBtn').addEventListener('click', async () => {
   const selected = getSelectedItem();
   if (selected) {
-    const { loadProjectTasks } = await import('./todo.js');
     const projectId = selected.dataset.projectId;
     if (projectId) await api.deleteProject(projectId);
     selected.remove();
@@ -129,12 +110,13 @@ document.getElementById('deleteBtn').addEventListener('click', async () => {
 document.getElementById('addBtn').addEventListener('click', async () => {
   const item = document.createElement('div');
   item.className = 'item';
-  item.dataset.angle = '0';
+  item.dataset.angle = '225';
   item.textContent = '新项目';
   document.querySelector('.container').appendChild(item);
-  setPosition(item, 0);
+  setPosition(item, 225);
   item.addEventListener('click', () => selectItem(item, { tasks: [] }));
   await saveProject(item);
+  await loadProjects();
 });
 
 // 白噪音控制
@@ -184,7 +166,6 @@ document.getElementById('task-break').addEventListener('click', async () => {
   chatOverlay.classList.add('show');
   tbMessages.innerHTML = '';
 
-  const { getProjectTasks } = await import('./todo.js');
   const tasks = getProjectTasks();
   const projectInfo = `项目名称: ${selected.textContent}\n当前待办: ${tasks.map(t => t.text).join(', ') || '无'}`;
 
@@ -235,7 +216,6 @@ document.addEventListener('click', async (e) => {
   if (!isItem && !isPanel && !isPet && !isTB) {
     const selected = getSelectedItem();
     if (selected) {
-      const { loadProjectTasks } = await import('./todo.js');
       await saveProject(selected, true);
       selected.classList.remove('selected');
       setSelectedItem(null);
@@ -252,4 +232,27 @@ document.addEventListener('click', async (e) => {
     }
   }
 });
+
+// 认证检查
+(function checkAuth() {
+  const token = localStorage.getItem('authToken');
+  const userId = localStorage.getItem('userId');
+
+  if (!token || !userId) {
+    window.location.href = '/login.html';
+    return;
+  }
+
+  fetch('http://localhost:9999/api/auth/me', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  }).then(res => {
+    if (!res.ok) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userId');
+      window.location.href = '/login.html';
+    }
+  }).catch(err => {
+    console.error('认证检查失败:', err);
+  });
+})();
 

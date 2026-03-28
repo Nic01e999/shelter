@@ -17,30 +17,42 @@ SHELTER 是一个心理健康与专注力管理 Web 应用，结合 AI 陪伴、
 
 ```
 shelter/
-├── index.html          # 主页面：圆形轨道 + 侧边面板
+├── index.html          # 主页面
+├── chart.html          # 专注时间图表页面
 ├── server.py           # 服务器启动入口
-├── css/style.css       # 样式：深色主题 + 渐变效果
+├── css/                # 样式文件（模块化）
+│   ├── base.css       # 基础样式
+│   ├── window.css     # 窗景样式
+│   ├── circle.css     # 圆形轨道
+│   ├── panel.css      # 侧边面板
+│   ├── todo.css       # 待办清单
+│   ├── fire.css       # 专注模式
+│   ├── chat.css       # 聊天窗口
+│   ├── audio.css      # 音频控制
+│   ├── pet.css        # AI 宠物
+│   └── space.css      # 太空背景
 ├── js/
-│   ├── main.js         # 主入口，事件绑定
-│   ├── circle.js       # 圆形轨道系统
-│   ├── todo.js         # 待办清单系统
-│   ├── drag.js         # 拖拽交互
-│   ├── api.js          # API 调用封装
-│   └── sortable.min.js # 拖拽库
+│   ├── main.js        # 主入口
+│   ├── api.js         # API 调用（ES6 模块）
+│   ├── circle.js      # 圆形轨道系统
+│   ├── todo.js        # 待办清单
+│   ├── planet.js      # 星球交互
+│   ├── pet.js         # AI 宠物交互
+│   └── chart.js       # 图表可视化
 ├── backend/
-│   ├── app.py          # Flask 应用主文件
-│   ├── database.py     # 数据库连接
-│   ├── routes/         # 路由模块
-│   │   ├── __init__.py
-│   │   ├── users.py    # 用户相关路由
-│   │   └── projects.py # 项目相关路由
-│   └── ai/             # Python AI 代理（ReAct 模式）
-│       ├── agent.py    # ReActAgent 核心实现
-│       └── prompt_template.py
+│   ├── app.py         # Flask 应用
+│   ├── database.py    # 数据库连接
+│   └── routes/        # API 路由
+│       ├── __init__.py
+│       ├── users.py   # 用户管理
+│       ├── projects.py # 项目管理
+│       ├── modefire.py # 专注模式
+│       ├── ai.py      # AI 接口
+│       └── auth.py    # 认证
 ├── database/
-│   └── user.db         # SQLite 数据库
+│   └── user.db        # SQLite 数据库
 └── docs/
-    └── draft.md        # 项目需求文档
+    └── draft.md       # 需求文档
 ```
 
 ### 前端架构（模块化设计）
@@ -180,6 +192,41 @@ DEEPSEEK_API_KEY=your_api_key_here
   - JavaScript：camelCase（函数、变量）
   - Python：snake_case（函数、变量），PascalCase（类）
 - **不可变性**：优先创建新对象而非修改现有对象
+
+## 已知问题（需修复）
+
+### 前端问题
+
+**CRITICAL**:
+- `js/planet.js:1` - 重复声明 `longPressTimer` 变量，导致语法错误
+
+**HIGH**:
+- `js/planet.js` - 长按检测功能未正常工作
+- `js/planet.js` - 鼠标悬停时未显示 pointer 光标
+
+**MEDIUM**:
+- `js/api.js:97` - 使用了 `export` 但未作为模块加载
+- 多个文件存在未使用的变量和函数
+- 部分事件监听器未正确清理
+
+### 后端问题
+
+**CRITICAL**:
+- `backend/routes/ai.py` - 缺少 API 调用错误处理，失败时返回 500 错误
+
+**HIGH**:
+- 多处缺少类型注解（违反 PEP 8）
+- `backend/routes/projects.py` - SQL 查询未使用参数化，存在注入风险
+
+**MEDIUM**:
+- 多个文件有未使用的导入
+- 部分函数存在重复逻辑，可提取为工具函数
+
+### CSS 问题
+
+**MEDIUM**:
+- `css/space.css` - 部分未使用的样式规则
+- 多个文件存在重复的样式定义
 
 ## 数据持久化
 

@@ -61,8 +61,6 @@ export async function sendChatMessage(options) {
     });
 
     const data = await response.json();
-    console.log('📨 AI 响应数据:', data);
-    console.log('🔍 project_created 标志:', data.project_created);
     typingIndicator.remove();
 
     if (data.success) {
@@ -78,15 +76,12 @@ export async function sendChatMessage(options) {
 
       // 如果创建了项目，刷新项目列表
       if (data.project_created) {
-        console.log('✅ 检测到项目创建，刷新项目列表');
         const { loadProjects } = await import('./circle.js');
         await loadProjects();
       }
 
       // 如果更新了待办清单，执行回调
-      console.log('🔔 todolist_updated:', data.todolist_updated, 'onSuccess:', !!onSuccess);
       if (data.todolist_updated && onSuccess) {
-        console.log('✅ 调用 onSuccess 回调');
         await onSuccess();
       }
     } else {

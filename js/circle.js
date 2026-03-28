@@ -6,7 +6,7 @@ const radius = 350;
 const centerX = 350;
 const centerY = 350;
 let selectedItem = null;
-let currentUserId = 1;
+let currentUserId = parseInt(localStorage.getItem('userId')) || 1;
 let projects = [];
 
 function setPosition(item, angle) {
@@ -39,20 +39,25 @@ async function saveProject(item, saveTasks = false) {
   const title = item.textContent;
   const angle = parseFloat(item.dataset.angle);
 
-  let tasks = [];
+  if (!projectId) {
+    const result = await api.createProject(currentUserId, title, angle, []);
+    item.dataset.projectId = result.id;
+    return;
+  }
+
+  let tasks;
   if (saveTasks && item === selectedItem) {
     tasks = getProjectTasks();
-  } else if (projectId) {
-    const projects = await api.getProjects(currentUserId);
+  } else {
     const currentProject = projects.find(p => p.id == projectId);
     tasks = currentProject ? currentProject.tasks : [];
   }
 
-  if (projectId) {
-    await api.updateProject(projectId, title, angle, tasks);
-  } else {
-    const result = await api.createProject(currentUserId, title, angle, tasks);
-    item.dataset.projectId = result.id;
+  await api.updateProject(projectId, title, angle, tasks);
+
+  const projectIndex = projects.findIndex(p => p.id == projectId);
+  if (projectIndex !== -1) {
+    projects[projectIndex] = { ...projects[projectIndex], title, position_angle: angle, tasks };
   }
 }
 
@@ -70,7 +75,9 @@ async function selectItem(item, project) {
   document.getElementById('itemText').value = item.textContent;
   document.getElementById('panel-display').classList.remove('hidden');
 
-  loadProjectTasks(project?.tasks || []);
+  const projectId = item.dataset.projectId;
+  const currentProject = projects.find(p => p.id == projectId);
+  loadProjectTasks(currentProject?.tasks || []);
   updateButtonStates();
 }
 
