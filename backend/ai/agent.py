@@ -24,12 +24,18 @@ class ReActAgent:
             api_key=ReActAgent.get_api_key(),
         )
 
-    def run(self, user_input: str, max_iterations: int = 5):
+    def run(self, user_input: str, max_iterations: int = 5, history: list = None):
         prompt_template = get_prompt(self.role)
-        messages = [
-            {"role": "system", "content": self.render_system_prompt(prompt_template)},
-            {"role": "user", "content": f"<question>{user_input}</question>"}
-        ]
+
+        # 使用历史记录或创建新的消息列表
+        if history:
+            messages = history.copy()
+            messages.append({"role": "user", "content": f"<question>{user_input}</question>"})
+        else:
+            messages = [
+                {"role": "system", "content": self.render_system_prompt(prompt_template)},
+                {"role": "user", "content": f"<question>{user_input}</question>"}
+            ]
 
         iteration = 0
         while iteration < max_iterations:
@@ -68,12 +74,19 @@ class ReActAgent:
             action = action_match.group(1)
             tool_name, args = self.parse_action(action)
 
-            print(f"\n\n🔧 Action: {tool_name}({', '.join(args)})")
+            print(f"\n\n🔧 Action: {tool_name}()")
+            print(f"   参数: {args}")
 
             # Web 模式下，talk() 直接返回响应并结束
             if tool_name == "talk":
                 try:
                     response = self.tools[tool_name](*args)
+                    # 保存助手的回复到历史
+                    messages.append({"role": "assistant", "content": content})
+                    # 更新传入的历史记录
+                    if history is not None:
+                        history.clear()
+                        history.extend(messages)
                     return response
                 except Exception as e:
                     return f"错误：{str(e)}"
@@ -139,17 +152,18 @@ class ReActAgent:
         func_name = match.group(1)
         args_str = match.group(2).strip()
 
-        # 手动解析参数，特别处理包含多行内容的字符串
+        # 手动解析参数，追踪字符串、括号和方括号深度
         args = []
         current_arg = ""
         in_string = False
         string_char = None
         i = 0
         paren_depth = 0
-        
+        bracket_depth = 0
+
         while i < len(args_str):
             char = args_str[i]
-            
+
             if not in_string:
                 if char in ['"', "'"]:
                     in_string = True
@@ -161,8 +175,14 @@ class ReActAgent:
                 elif char == ')':
                     paren_depth -= 1
                     current_arg += char
-                elif char == ',' and paren_depth == 0:
-                    # 遇到顶层逗号，结束当前参数
+                elif char == '[':
+                    bracket_depth += 1
+                    current_arg += char
+                elif char == ']':
+                    bracket_depth -= 1
+                    current_arg += char
+                elif char == ',' and paren_depth == 0 and bracket_depth == 0:
+                    # 只在顶层（括号和方括号外）的逗号才分割参数
                     args.append(self._parse_single_arg(current_arg.strip()))
                     current_arg = ""
                 else:
@@ -172,13 +192,13 @@ class ReActAgent:
                 if char == string_char and (i == 0 or args_str[i-1] != '\\'):
                     in_string = False
                     string_char = None
-            
+
             i += 1
-        
+
         # 添加最后一个参数
         if current_arg.strip():
             args.append(self._parse_single_arg(current_arg.strip()))
-        
+
         return func_name, args
     
     def _parse_single_arg(self, arg_str: str):
@@ -238,26 +258,11 @@ def websearch(query: str) -> str:
     """模拟网络搜索（实际项目中需接入真实搜索 API）"""
     return f"[搜索结果] 关于 '{query}' 的信息：这是一个常见问题，建议采取相应措施。"
 
-def up_todolist(project_id: int, items: list) -> str:
-    """更新待办清单"""
-    import sys
-    import os
-    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-    from database import get_db
-    import json
-
-    conn = get_db()
-    conn.execute(
-        'UPDATE todo_lists SET tasks = ? WHERE id = ?',
-        (json.dumps(items), project_id)
-    )
-    conn.commit()
-    conn.close()
-
-    print(f"\n📝 待办清单已更新：")
-    for i, item in enumerate(items, 1):
-        print(f"  {i}. {item}")
-    return "待办清单已更新"
+def up_todolist(items: list) -> str:
+    """更新待办清单，参数: items (list) - 任务列表 ["任务1", "任务2", ...]"""
+    # project_id 通过 functools.partial 在 service.py 中绑定
+    # 这个函数会被包装，实际调用时 project_id 已经绑定
+    raise NotImplementedError("此函数需要通过 service.py 中的 partial 绑定 project_id 后使用")
 
 def task_breaker(task: str, project_id: int) -> str:
     """调用任务拆解助手"""

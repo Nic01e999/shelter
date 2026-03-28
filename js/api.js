@@ -84,11 +84,11 @@ const api = {
     return res.json();
   },
 
-  async sendChatMessage(userId, message, role = 'psychology') {
+  async sendChatMessage(userId, message, role = 'psychology', projectId = null) {
     const res = await fetchWithAuth(`${API_BASE}/ai/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, message, role })
+      body: JSON.stringify({ user_id: userId, project_id: projectId, message, role })
     });
     return res.json();
   }

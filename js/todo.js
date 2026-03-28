@@ -2,6 +2,7 @@
 import { saveProject, getSelectedItem } from './circle.js';
 
 const todoList = document.getElementById('todoList');
+let saveTimeout;
 
 function createTodoItem() {
   const item = document.createElement('div');
@@ -21,8 +22,11 @@ function createTodoItem() {
   input.setAttribute('data-placeholder', '待办事项');
 
   input.addEventListener('input', () => {
-    const selected = getSelectedItem();
-    if (selected) saveProject(selected, true);
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+      const selected = getSelectedItem();
+      if (selected) saveProject(selected, true);
+    }, 500);
   });
 
   input.addEventListener('keydown', (e) => {

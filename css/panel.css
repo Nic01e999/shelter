@@ -69,6 +69,19 @@
   transform: translateY(-1px);
 }
 
+.panel button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(100, 100, 100, 0.2);
+  border-color: rgba(100, 100, 100, 0.3);
+}
+
+.panel button:disabled:hover {
+  transform: none;
+  background: rgba(100, 100, 100, 0.2);
+  border-color: rgba(100, 100, 100, 0.3);
+}
+
 #task-break {
   grid-column: 1/3;
   grid-row: 2/3;

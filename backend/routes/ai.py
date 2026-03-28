@@ -11,6 +11,7 @@ def ai_chat():
     """AI 对话接口"""
     data = request.json
     user_id = data.get('user_id')
+    project_id = data.get('project_id')
     message = data.get('message')
     role = data.get('role', 'psychology')
 
@@ -18,12 +19,21 @@ def ai_chat():
     from service import AIService
 
     try:
-        ai_service = AIService(user_id)
-        response = ai_service.chat(message, role)
-        return jsonify({
-            'success': True,
-            'response': response
-        })
+        ai_service = AIService(user_id, project_id)
+        result = ai_service.chat(message, role)
+
+        if isinstance(result, dict):
+            return jsonify({
+                'success': True,
+                'response': result['response'],
+                'todolist_updated': result.get('todolist_updated', False)
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'response': result,
+                'todolist_updated': False
+            })
     except Exception as e:
         return jsonify({
             'success': False,

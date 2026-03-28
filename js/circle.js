@@ -56,6 +56,7 @@ async function saveProject(item, saveTasks = false) {
 
 async function selectItem(item, project) {
   const { loadProjectTasks } = await import('./todo.js');
+  const { updateButtonStates } = await import('./main.js');
 
   if (selectedItem && selectedItem !== item) {
     await saveProject(selectedItem, true);
@@ -77,6 +78,8 @@ async function selectItem(item, project) {
   } else {
     loadProjectTasks([]);
   }
+
+  updateButtonStates();
 }
 
 function getSelectedItem() {

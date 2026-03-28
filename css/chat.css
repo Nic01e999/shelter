@@ -1,20 +1,20 @@
 .pet {
   position: fixed;
-  left: 10%;    /* 离左边距离 */
-  bottom: 20%; /* 离底部距离 */
+  left: 5%;    /* 离左边距离 */
+  bottom: 0%; /* 离底部距离 */
   z-index: 100000; /* 保证在最上层 */
   cursor: pointer;
 
 }
 
 .pet img {
-  width: 120px; /* 你可以改大小 */
+  width: 17rem; 
   height: auto;
   display: block;
 }
 
 
-#chat-window {
+.chat-window {
   position: fixed;
   top: 0;
   bottom: 0;
@@ -23,7 +23,7 @@
   width: 50vh;
   height: 100vh;
   z-index: 100000;
-  display: flex;
+  display: none;
   flex-direction: column;
   padding: 20px;
   background: rgba(45, 45, 45, 0.4);
@@ -31,8 +31,6 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   border-radius: 20px;
-
-  display: none;
 }
 
 .chat-messages {
@@ -67,6 +65,61 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   color: #e0e0e0;
   border-bottom-left-radius: 5px;
+}
+
+.ai-message h1, .ai-message h2, .ai-message h3 {
+  margin: 0.5em 0 0.3em 0;
+  color: #ff9a56;
+}
+
+.ai-message p {
+  margin: 0.5em 0;
+}
+
+.ai-message code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.ai-message pre {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.5em 0;
+}
+
+.ai-message pre code {
+  background: none;
+  padding: 0;
+}
+
+.ai-message ul, .ai-message ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.ai-message li {
+  margin: 0.3em 0;
+}
+
+.ai-message blockquote {
+  border-left: 3px solid #ff9a56;
+  padding-left: 10px;
+  margin: 0.5em 0;
+  color: #b0b0b0;
+}
+
+.ai-message a {
+  color: #ff9a56;
+  text-decoration: none;
+}
+
+.ai-message a:hover {
+  text-decoration: underline;
 }
 
 .chat-input-container {

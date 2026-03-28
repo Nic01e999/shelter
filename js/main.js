@@ -24,15 +24,25 @@ async function checkAuth() {
 checkAuth();
 
 // 主入口文件
-import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition } from './circle.js';
+import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition, currentUserId } from './circle.js';
 import { initModefire } from './modefire.js';
 import { initAudio, togglePlay, changeSound, setVolume } from './audio.js';
+import { sendChatMessage } from './chat.js';
+import CONFIG from './config.js';
 import './drag.js';
+
+// 更新按钮状态
+export function updateButtonStates() {
+  const hasSelection = !!getSelectedItem();
+  document.getElementById('deleteBtn').disabled = !hasSelection;
+  document.getElementById('task-break').disabled = !hasSelection;
+}
 
 // 初始化
 loadProjects();
 initModefire();
 initAudio();
+updateButtonStates();
 
 // 宠物聊天窗口切换
 const petImg = document.getElementById('petImg');
@@ -41,54 +51,31 @@ petImg.addEventListener('click', () => {
   chatWindow.style.display = chatWindow.style.display === 'none' || chatWindow.style.display === '' ? 'flex' : 'none';
 });
 
-// 聊天功能
+// 心理老师聊天
 const chatInput = document.querySelector('.chat-input');
 const chatSendBtn = document.querySelector('.chat-send-btn');
 const chatMessages = document.querySelector('.chat-messages');
 
-async function sendMessage() {
-  const message = chatInput.value.trim();
-  if (!message) return;
-
-  // 显示用户消息
-  const userMsg = document.createElement('div');
-  userMsg.className = 'chat-message user-message';
-  userMsg.textContent = message;
-  chatMessages.appendChild(userMsg);
-  chatInput.value = '';
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  // 显示思考动画
-  const typingIndicator = document.createElement('div');
-  typingIndicator.className = 'typing-indicator';
-  typingIndicator.innerHTML = '<span></span><span></span><span></span>';
-  chatMessages.appendChild(typingIndicator);
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-
-  try {
-    const response = await api.sendChatMessage(1, message);
-    typingIndicator.remove();
-    if (response.success) {
-      const aiMsg = document.createElement('div');
-      aiMsg.className = 'chat-message ai-message';
-      aiMsg.innerHTML = response.response.replace(/\n/g, '<br>');
-      chatMessages.appendChild(aiMsg);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+async function sendPsychologyMessage() {
+  await sendChatMessage({
+    message: chatInput.value.trim(),
+    role: CONFIG.CHAT_ROLES.PSYCHOLOGY,
+    messagesContainer: chatMessages,
+    inputElement: chatInput,
+    userId: currentUserId,
+    onSuccess: async () => {
+      const selected = getSelectedItem();
+      if (selected && selected.dataset.projectId) {
+        const { loadProjectTasks } = await import('./todo.js');
+        await loadProjectTasks(selected.dataset.projectId);
+      }
     }
-  } catch (error) {
-    typingIndicator.remove();
-    const errorMsg = document.createElement('div');
-    errorMsg.className = 'chat-message ai-message';
-    errorMsg.textContent = '宠物遇到了点小意外...';
-    chatMessages.appendChild(errorMsg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-    console.error('发送消息失败:', error);
-  }
+  });
 }
 
-chatSendBtn.addEventListener('click', sendMessage);
+chatSendBtn.addEventListener('click', sendPsychologyMessage);
 chatInput.addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') sendMessage();
+  if (e.key === 'Enter') sendPsychologyMessage();
 });
 
 // 项目标题编辑
@@ -111,6 +98,7 @@ document.getElementById('deleteBtn').addEventListener('click', async () => {
     setSelectedItem(null);
     document.getElementById('itemText').value = '';
     loadProjectTasks([]);
+    updateButtonStates();
   }
 });
 
@@ -150,13 +138,88 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
   window.location.href = '/login.html';
 });
 
+// TaskBreaker 窗口
+const tbWindow = document.getElementById('tb-window');
+const tbInput = document.getElementById('tb-input');
+const tbSendBtn = document.getElementById('tb-send');
+const tbMessages = document.getElementById('tb-messages');
+
+// 刷新项目数据的通用函数
+async function refreshProjectData(projectId) {
+  await loadProjects();
+  const item = document.querySelector(`[data-project-id="${projectId}"]`);
+  if (item) {
+    const projects = await api.getProjects(currentUserId);
+    const project = projects.find(p => p.id == projectId);
+    if (project) await selectItem(item, project);
+  }
+}
+
+document.getElementById('task-break').addEventListener('click', async () => {
+  const selected = getSelectedItem();
+  if (!selected) {
+    alert('请先选择一个项目');
+    return;
+  }
+
+  const projectId = parseInt(selected.dataset.projectId);
+  if (!projectId) {
+    alert('请先保存项目');
+    return;
+  }
+
+  tbWindow.style.display = 'flex';
+  tbMessages.innerHTML = '';
+
+  const { getProjectTasks } = await import('./todo.js');
+  const tasks = getProjectTasks();
+  const projectInfo = `项目名称: ${selected.textContent}\n当前待办: ${tasks.map(t => t.text).join(', ') || '无'}`;
+
+  await sendChatMessage({
+    message: projectInfo,
+    role: CONFIG.CHAT_ROLES.TASKBREAKER,
+    messagesContainer: tbMessages,
+    inputElement: tbInput,
+    userId: currentUserId,
+    projectId: projectId,
+    onSuccess: () => refreshProjectData(projectId)
+  });
+});
+
+async function sendTBMessage() {
+  const selected = getSelectedItem();
+  if (!selected) return;
+
+  const projectId = parseInt(selected.dataset.projectId);
+  if (!projectId) {
+    alert('项目ID无效');
+    return;
+  }
+
+  await sendChatMessage({
+    message: tbInput.value.trim(),
+    role: CONFIG.CHAT_ROLES.TASKBREAKER,
+    messagesContainer: tbMessages,
+    inputElement: tbInput,
+    userId: currentUserId,
+    projectId: projectId,
+    onSuccess: () => refreshProjectData(projectId)
+  });
+}
+
+tbSendBtn.addEventListener('click', sendTBMessage);
+tbInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') sendTBMessage();
+});
+
 // 空白点击事件
 document.addEventListener('click', async (e) => {
   const isItem = e.target.closest('.item');
   const isPanel = e.target.closest('.panel');
   const isPet = e.target.closest('.pet');
+  const isTB = e.target.closest('#tb-window');
 
-  if (!isItem && !isPanel && !isPet) {
+  if (!isItem && !isPanel && !isPet && !isTB) {
     const selected = getSelectedItem();
     if (selected) {
       const { loadProjectTasks } = await import('./todo.js');
@@ -164,9 +227,13 @@ document.addEventListener('click', async (e) => {
       selected.classList.remove('selected');
       setSelectedItem(null);
       document.getElementById('panel-display').classList.add('hidden');
+      updateButtonStates();
     }
     if (chatWindow.style.display === 'flex') {
       chatWindow.style.display = 'none';
+    }
+    if (tbWindow.style.display === 'flex') {
+      tbWindow.style.display = 'none';
     }
   }
 });
