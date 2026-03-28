@@ -1,3 +1,28 @@
+// 认证检查
+const token = localStorage.getItem('authToken');
+const userId = localStorage.getItem('userId');
+
+if (!token || !userId) {
+  window.location.href = '/login.html';
+}
+
+async function checkAuth() {
+  try {
+    const res = await fetch('http://localhost:9999/api/auth/me', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userId');
+      window.location.href = '/login.html';
+    }
+  } catch (err) {
+    console.error('认证检查失败:', err);
+  }
+}
+
+checkAuth();
+
 // 主入口文件
 import { loadProjects, saveProject, selectItem, getSelectedItem, setSelectedItem, setPosition } from './circle.js';
 import { initModefire } from './modefire.js';
@@ -109,5 +134,19 @@ document.getElementById('audio-toggle').addEventListener('click', () => {
 
 document.getElementById('audio-source').addEventListener('change', (e) => {
   changeSound(e.target.value);
+});
+
+// 登出
+document.getElementById('logout-btn')?.addEventListener('click', async () => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    await fetch('http://localhost:9999/api/auth/logout', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+  }
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userId');
+  window.location.href = '/login.html';
 });
 
