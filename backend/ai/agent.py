@@ -264,6 +264,29 @@ def up_todolist(items: list) -> str:
     # 这个函数会被包装，实际调用时 project_id 已经绑定
     raise NotImplementedError("此函数需要通过 service.py 中的 partial 绑定 project_id 后使用")
 
+def create_project(title: str, user_id: int = 1) -> str:
+    """创建新项目，参数: title (str) - 项目标题, user_id (int) - 用户ID（默认1）"""
+    import sys
+    import os
+    import json
+    import random
+    sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+    from database import get_db
+
+    # 随机生成一个角度位置（0-360度）
+    angle = random.randint(0, 360)
+
+    conn = get_db()
+    cursor = conn.execute(
+        'INSERT INTO todo_lists (user_id, title, position_angle, tasks) VALUES (?, ?, ?, ?)',
+        (user_id, title, angle, json.dumps([]))
+    )
+    conn.commit()
+    project_id = cursor.lastrowid
+    conn.close()
+
+    return f"已创建项目 '{title}'（ID: {project_id}，位置: {angle}°）"
+
 def task_breaker(task: str, project_id: int) -> str:
     """调用任务拆解助手"""
     import sys
@@ -297,7 +320,7 @@ def main(role, project_directory):
 
     # 根据角色选择工具集
     if role == 'psychology':
-        tools = [talk, websearch, task_breaker, read_file, write_to_file]
+        tools = [talk, websearch, task_breaker, create_project, read_file, write_to_file]
     else:  # taskbreaker
         tools = [talk, up_todolist, read_file, write_to_file]
 

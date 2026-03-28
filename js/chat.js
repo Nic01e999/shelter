@@ -42,17 +42,20 @@ export async function sendChatMessage(options) {
     });
 
     const data = await response.json();
+    console.log('📨 AI 响应数据:', data);
     typingIndicator.remove();
 
     if (data.success) {
       const aiMsg = document.createElement('div');
       aiMsg.className = 'chat-message ai-message';
-      aiMsg.innerHTML = marked.parse(data.response);
+      aiMsg.innerHTML = typeof marked !== 'undefined' ? marked.parse(data.response) : data.response;
       messagesContainer.appendChild(aiMsg);
       messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
       // 如果更新了待办清单，执行回调
+      console.log('🔔 todolist_updated:', data.todolist_updated, 'onSuccess:', !!onSuccess);
       if (data.todolist_updated && onSuccess) {
+        console.log('✅ 调用 onSuccess 回调');
         await onSuccess();
       }
     } else {

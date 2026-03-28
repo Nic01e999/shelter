@@ -38,6 +38,22 @@ export function updateButtonStates() {
   document.getElementById('task-break').disabled = !hasSelection;
 }
 
+// 刷新项目数据
+async function refreshProjectData(projectId) {
+  console.log('🔄 refreshProjectData 被调用, projectId:', projectId);
+  const api = await import('./api.js');
+  await loadProjects();
+  const item = document.querySelector(`[data-project-id="${projectId}"]`);
+  console.log('🔍 找到的 item:', item);
+  if (item) {
+    const projects = await api.default.getProjects(currentUserId);
+    console.log('📦 获取到的 projects:', projects);
+    const project = projects.find(p => p.id == projectId);
+    console.log('🎯 匹配的 project:', project);
+    if (project) await selectItem(item, project);
+  }
+}
+
 // 初始化
 loadProjects();
 initModefire();
@@ -64,19 +80,17 @@ const chatSendBtn = document.querySelector('.chat-send-btn');
 const chatMessages = document.querySelector('.chat-messages');
 
 async function sendPsychologyMessage() {
+  const selected = getSelectedItem();
+  const projectId = selected?.dataset.projectId;
+
   await sendChatMessage({
     message: chatInput.value.trim(),
     role: CONFIG.CHAT_ROLES.PSYCHOLOGY,
     messagesContainer: chatMessages,
     inputElement: chatInput,
     userId: currentUserId,
-    onSuccess: async () => {
-      const selected = getSelectedItem();
-      if (selected && selected.dataset.projectId) {
-        const { loadProjectTasks } = await import('./todo.js');
-        await loadProjectTasks(selected.dataset.projectId);
-      }
-    }
+    projectId: projectId ? parseInt(projectId) : undefined,
+    onSuccess: () => projectId ? refreshProjectData(parseInt(projectId)) : null
   });
 }
 
@@ -151,17 +165,6 @@ const tbInput = document.getElementById('tb-input');
 const tbSendBtn = document.getElementById('tb-send');
 const tbMessages = document.getElementById('tb-messages');
 
-// 刷新项目数据的通用函数
-async function refreshProjectData(projectId) {
-  await loadProjects();
-  const item = document.querySelector(`[data-project-id="${projectId}"]`);
-  if (item) {
-    const projects = await api.getProjects(currentUserId);
-    const project = projects.find(p => p.id == projectId);
-    if (project) await selectItem(item, project);
-  }
-}
-
 document.getElementById('task-break').addEventListener('click', async () => {
   const selected = getSelectedItem();
   if (!selected) {
@@ -176,6 +179,7 @@ document.getElementById('task-break').addEventListener('click', async () => {
   }
 
   tbWindow.style.display = 'flex';
+  chatOverlay.classList.add('show');
   tbMessages.innerHTML = '';
 
   const { getProjectTasks } = await import('./todo.js');
@@ -242,6 +246,7 @@ document.addEventListener('click', async (e) => {
     }
     if (tbWindow.style.display === 'flex') {
       tbWindow.style.display = 'none';
+      chatOverlay.classList.remove('show');
     }
   }
 });

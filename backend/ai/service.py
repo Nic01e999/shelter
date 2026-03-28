@@ -6,9 +6,6 @@ sys.path.insert(0, os.path.dirname(__file__))
 from agent import ReActAgent, talk, websearch, task_breaker, read_file, write_to_file
 from tools import update_todolist
 
-# 全局会话历史存储 {(user_id, project_id, role): messages}
-_session_history = {}
-
 class AIService:
     def __init__(self, user_id: int, project_id: int = None, project_directory: str = None):
         self.user_id = user_id
@@ -25,11 +22,6 @@ class AIService:
             bound_update.__name__ = 'up_todolist'
             tools = [talk, bound_update, read_file, write_to_file]
 
-        # 获取或创建会话历史
-        session_key = (self.user_id, self.project_id, role)
-        if session_key not in _session_history:
-            _session_history[session_key] = []
-
         agent = ReActAgent(
             tools=tools,
             model="deepseek-chat",
@@ -37,9 +29,9 @@ class AIService:
             role=role
         )
 
-        response = agent.run(message, history=_session_history[session_key])
+        response = agent.run(message, history=[])
 
         # 检查是否更新了待办清单
-        updated_todolist = role == 'taskbreaker' and 'up_todolist' in str(_session_history[session_key][-5:])
+        updated_todolist = role == 'taskbreaker' and 'up_todolist' in response
 
         return {'response': response, 'todolist_updated': updated_todolist}
