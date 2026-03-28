@@ -18,7 +18,7 @@
 
 #audio-toggle {
   border: none !important;
-  background: url('../access/btn_image_new/audio_start.PNG') no-repeat center/contain !important;
+  background: url('../access/btn_image/audio_startBtn.PNG') no-repeat center/contain !important;
   border-radius: 0 !important;
   color: transparent;
   cursor: pointer;
@@ -28,9 +28,9 @@
 }
 
 #audio-toggle.playing {
-  background: url('../access/btn_image_new/audio_pause.PNG') no-repeat center/contain !important;
+  background: url('../access/btn_image/audio_pauseBtn.PNG') no-repeat center/contain !important;
   scale: 2;
-  
+
 }
 
 .audio-btn {
