@@ -12,9 +12,9 @@
 }
 
 .audio-controls {
-  display: flex;
-  gap: 10px;
-  align-items: center;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1.5fr;
 }
 
 .audio-btn {
