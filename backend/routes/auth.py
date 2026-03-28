@@ -109,11 +109,20 @@ def get_me():
 def forgot_password():
     data = request.json
     email = data.get('email', '').strip()
+    is_register = data.get('is_register', False)
 
     if not validate_email(email):
         return jsonify({'error': '邮箱格式错误'}), 400
 
     conn = get_db()
+
+    # 注册场景：检查邮箱是否已存在
+    if is_register:
+        existing = conn.execute('SELECT id FROM users WHERE email = ?', (email,)).fetchone()
+        if existing:
+            conn.close()
+            return jsonify({'error': '邮箱已注册，请直接登录'}), 400
+
     recent = conn.execute(
         'SELECT created_at FROM reset_codes WHERE email = ? '
         'ORDER BY created_at DESC LIMIT 1',
@@ -144,6 +153,7 @@ def reset_password():
     email = data.get('email', '').strip()
     code = data.get('code', '').strip()
     password = data.get('password', '')
+    is_register = data.get('is_register', False)
 
     if not validate_email(email) or not validate_code(code) or not validate_password(password):
         return jsonify({'error': '参数错误'}), 400
@@ -170,6 +180,9 @@ def reset_password():
     password_hash = hash_password(password)
 
     if user:
+        if is_register:
+            conn.close()
+            return jsonify({'error': '邮箱已注册，请直接登录'}), 400
         conn.execute('UPDATE users SET password_hash = ? WHERE id = ?', (password_hash, user['id']))
         conn.execute('DELETE FROM sessions WHERE user_id = ?', (user['id'],))
         user_id = user['id']

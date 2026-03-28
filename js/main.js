@@ -150,3 +150,24 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
   window.location.href = '/login.html';
 });
 
+// 空白点击事件
+document.addEventListener('click', async (e) => {
+  const isItem = e.target.closest('.item');
+  const isPanel = e.target.closest('.panel');
+  const isPet = e.target.closest('.pet');
+
+  if (!isItem && !isPanel && !isPet) {
+    const selected = getSelectedItem();
+    if (selected) {
+      const { loadProjectTasks } = await import('./todo.js');
+      await saveProject(selected, true);
+      selected.classList.remove('selected');
+      setSelectedItem(null);
+      document.getElementById('panel-display').classList.add('hidden');
+    }
+    if (chatWindow.style.display === 'flex') {
+      chatWindow.style.display = 'none';
+    }
+  }
+});
+

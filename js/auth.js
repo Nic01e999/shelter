@@ -76,7 +76,7 @@ document.getElementById('register-form').addEventListener('submit', async (e) =>
         const response = await fetch(`${API_BASE}/api/auth/forgot-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email, is_register: true })
         });
         const data = await response.json();
 
@@ -147,7 +147,7 @@ document.getElementById('verify-form').addEventListener('submit', async (e) => {
         const response = await fetch(`${API_BASE}/api/auth/reset-password`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, code, password })
+            body: JSON.stringify({ email, code, password, is_register: !isResetMode })
         });
         const data = await response.json();
 

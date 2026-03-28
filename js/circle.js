@@ -65,6 +65,7 @@ async function selectItem(item, project) {
   selectedItem = item;
   item.classList.add('selected');
   document.getElementById('itemText').value = item.textContent;
+  document.getElementById('panel-display').classList.remove('hidden');
 
   const projectId = item.dataset.projectId;
   if (projectId) {

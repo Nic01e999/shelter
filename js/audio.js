@@ -6,7 +6,8 @@ let isPlaying = false;
 const sounds = {
   rain: 'https://assets.mixkit.co/active_storage/sfx/2390/2390-preview.mp3',
   ocean: 'https://assets.mixkit.co/active_storage/sfx/2393/2393-preview.mp3',
-  cafe: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3'
+  cafe: 'https://assets.mixkit.co/active_storage/sfx/2462/2462-preview.mp3',
+  universe: 'https://cdn.pixabay.com/download/audio/2022/03/13/audio_dc57160e56.mp3?filename=freesound_community-001210_the-sound-of-universe-53546.mp3'
 };
 
 export function initAudio() {
