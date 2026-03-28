@@ -94,8 +94,8 @@
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
-  background: rgba(255, 154, 86, 0.2);
-  border: 1px solid rgba(255, 154, 86, 0.3);
+  background: rgba(45, 222, 253, 0.2);
+  border: 1px solid rgba(45, 222, 253, 0.3);
   color: #e0e0e0;
   cursor: pointer;
   font-size: 14px;
@@ -103,8 +103,8 @@
 }
 
 .panel button:hover {
-  background: rgba(255, 154, 86, 0.3);
-  border-color: rgba(255, 154, 86, 0.5);
+  background: rgba(45, 222, 253, 0.3);
+  border-color: rgba(45, 222, 253, 0.5);
   transform: translateY(-1px);
 }
 

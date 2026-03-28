@@ -1,16 +1,58 @@
 .pet {
   position: fixed;
-  left: 5%;    /* 离左边距离 */
-  bottom: 0%; /* 离底部距离 */
-  z-index: 100000; /* 保证在最上层 */
+  left: 0%;
+  bottom: 25%;
+  z-index: 100001;
   cursor: pointer;
-
 }
 
-.pet img {
-  width: 17rem; 
-  height: auto;
-  display: block;
+.pet-layers {
+  position: relative;
+  width: 17rem;
+  height: 17rem;
+  animation: petFloat 3s ease-in-out infinite;
+}
+
+.pet-layers.bounce {
+  animation: petBounce 0.5s ease;
+}
+
+.pet-layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  object-fit: contain;
+}
+
+.pet-layer-1 {
+  z-index: 3;
+}
+
+.pet-layer-2 {
+  z-index: 2;
+}
+
+.pet-layer-3 {
+  z-index: 1;
+}
+
+.chat-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  z-index: 99999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.chat-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 
@@ -53,9 +95,11 @@
 
 .user-message {
   align-self: flex-end;
-  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
+  background: linear-gradient(135deg, #2ddefd 0%, #1ca3d6 100%);
   color: white;
   border-bottom-right-radius: 5px;
+  animation-name: float;
+  animation-duration: 0.5s;
 }
 
 .ai-message {
@@ -65,11 +109,55 @@
   border: 1px solid rgba(255, 255, 255, 0.05);
   color: #e0e0e0;
   border-bottom-left-radius: 5px;
+  animation-name: float;
+  animation-duration: 0.5s;
 }
+
+@keyframes float {
+  0%{
+    opacity: 0;
+    scale: 0.5;
+    transform: translateX(10px);
+  }
+
+  50%{
+    opacity: 1;
+  }
+
+  80%{
+    scale: 1;
+    animation-timing-function: ease;
+  }
+
+  100%{
+    #transform: translateX(-10px); 
+
+  }
+
+}
+
+@keyframes petFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes petBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+  }
+}
+
 
 .ai-message h1, .ai-message h2, .ai-message h3 {
   margin: 0.5em 0 0.3em 0;
-  color: #ff9a56;
+  color: #2ddefd;
 }
 
 .ai-message p {
@@ -107,14 +195,14 @@
 }
 
 .ai-message blockquote {
-  border-left: 3px solid #ff9a56;
+  border-left: 3px solid #2ddefd;
   padding-left: 10px;
   margin: 0.5em 0;
   color: #b0b0b0;
 }
 
 .ai-message a {
-  color: #ff9a56;
+  color: #2ddefd;
   text-decoration: none;
 }
 
@@ -149,7 +237,7 @@
   padding: 10px 20px;
   border: none;
   border-radius: 20px;
-  background: linear-gradient(135deg, #ff9a56 0%, #ff6b35 100%);
+  background: linear-gradient(135deg, #2ddefd 0%, #1ca3d6 100%);
   color: white;
   cursor: pointer;
   font-size: 14px;
@@ -158,7 +246,7 @@
 
 .chat-send-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(255, 154, 86, 0.3);
+  box-shadow: 0 4px 15px rgba(45, 222, 253, 0.3);
 }
 
 .chat-send-btn:active {
