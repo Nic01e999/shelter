@@ -1,8 +1,8 @@
 // 圆形轨道系统
 const container = document.querySelector('.container');
-const radius = 300;
-const centerX = 300;
-const centerY = 300;
+const radius = 350;
+const centerX = 350;
+const centerY = 350;
 let selectedItem = null;
 let currentUserId = 1;
 let projects = [];

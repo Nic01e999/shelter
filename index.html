@@ -16,8 +16,8 @@
   <div class="container">
     <div class="circle-track"></div>
   </div>
-  <div class="panel">
-    <div id="panel-display" class="hidden">
+  <div class="panel-container">
+    <div id="panel-display" class="hidden panel">
       <input type="text" id="itemText" placeholder="选择一个项目">
       <div class="todo-list" id="todoList">
         <div class="todo-item">
@@ -26,29 +26,32 @@
         </div>
       </div>
     </div>
-    <div id="panel-control">
-      <button id="addBtn">add</button>
-      <button id="deleteBtn">delete</button>
-      <button id="task-break">TB</button>
-      <button id="logout-btn" style="background: #ff8c42; color: #1a1a1a;">登出</button>
-    </div>
-    <div id="panel-modefire">
-      <button id="fire-toggle" class="fire-btn">🔥</button>
-      <a href="chart.html" target="_blank" id="fire-timer" class="fire-timer-link">00:00:00</a>
-    </div>
-    <div id="panel-audio">
-      <h3>🎵 White Noise</h3>
-      <div class="audio-controls">
-        <button id="audio-toggle" class="audio-btn">▶️ Play</button>
-        <select id="audio-source" class="audio-select">
-          <option value="rain">Rain</option>
-          <option value="ocean">Ocean</option>
-          <option value="cafe">Cafe</option>
-          <option value="universe">Universe</option>
-        </select>
+    <div class="panels-right">
+      <div id="panel-control" class="panel">
+        <button id="addBtn">add</button>
+        <button id="deleteBtn">delete</button>
+        <button id="task-break">TB</button>
+      </div>
+      <div id="panel-audio" class="panel">
+        <div class="audio-controls">
+          <button id="audio-toggle" class="audio-btn">▶️ Play</button>
+          <select id="audio-source" class="audio-select">
+            <option value="rain">Rain</option>
+            <option value="ocean">Ocean</option>
+            <option value="cafe">Cafe</option>
+            <option value="universe">Universe</option>
+          </select>
+        </div>
+      </div>
+      <div id="panel-modefire" class="panel">
+        <button id="fire-toggle" class="fire-btn">🔥</button>
+        <a href="chart.html" target="_blank" id="fire-timer" class="fire-timer-link">00:00:00</a>
+      </div>
+      <div id="book-mark" class="panel">
+        <button id="logout-btn" style="background: #ff8c42; color: #1a1a1a;">登出</button>
+        <button id="guide">i</button>
       </div>
     </div>
-
   </div>
   <div class="pet">
     <img id="petImg" src="access/image/cat.png">

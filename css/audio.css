@@ -1,6 +1,4 @@
 #panel-audio {
-  grid-row: 3/4;
-  grid-column: 2/3;
   padding: 15px;
   background: rgba(45, 45, 45, 0.4);
   backdrop-filter: blur(20px) saturate(180%);

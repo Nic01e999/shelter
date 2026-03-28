@@ -215,7 +215,7 @@ tbInput.addEventListener('keypress', (e) => {
 // 空白点击事件
 document.addEventListener('click', async (e) => {
   const isItem = e.target.closest('.item');
-  const isPanel = e.target.closest('.panel');
+  const isPanel = e.target.closest('.panel-container');
   const isPet = e.target.closest('.pet');
   const isTB = e.target.closest('#tb-window');
 
