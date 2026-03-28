@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>shelter</title>
   <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/window.css">
   <link rel="stylesheet" href="css/circle.css">
   <link rel="stylesheet" href="css/panel.css">
   <link rel="stylesheet" href="css/todo.css">
@@ -14,6 +15,14 @@
   <link rel="stylesheet" href="css/pet.css">
 </head>
 <body>
+  <div class="window-scene">
+    <div class="space-background"></div>
+    <div class="planet-container">
+      <img class="planet-image" src="access/image/earth.PNG" alt="planet">
+      <div class="planet-menu"></div>
+    </div>
+    <div class="window-frame"></div>
+  </div>
   <div id="chat-overlay" class="chat-overlay"></div>
   <div class="container">
     <div class="circle-track"></div>
@@ -80,7 +89,9 @@
   </div>
 
   <audio id="white-noise-audio" preload="auto"></audio>
+  <script type="module" src="js/api.js"></script>
   <script src="js/pet.js"></script>
+  <script src="js/planet.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 </html>
