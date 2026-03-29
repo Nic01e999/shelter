@@ -44,6 +44,12 @@ const petLayers = document.querySelector('.pet-layers');
 const chatWindow = document.getElementById('chat-window');
 const chatOverlay = document.getElementById('chat-overlay');
 petLayers.addEventListener('click', () => {
+  // 检查是否是长按触发的菜单，如果是则不打开聊天窗口
+  if (window.petIsLongPress) {
+    window.petIsLongPress = false;
+    return;
+  }
+
   // 添加弹跳动画
   petLayers.classList.add('bounce');
   setTimeout(() => petLayers.classList.remove('bounce'), 500);

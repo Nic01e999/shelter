@@ -7,6 +7,7 @@ const pets = [
 
 let currentPetIndex = 0;
 let longPressTimer = null;
+let isLongPress = false;
 
 const petLayers = document.querySelector('.pet-layers');
 const petContainer = document.querySelector('.pet');
@@ -24,7 +25,11 @@ petContainer.appendChild(menu);
 // 长按检测
 petLayers.addEventListener('mousedown', (e) => {
   if (e.button !== 0) return;
+  isLongPress = false;
+  window.petIsLongPress = false;
   longPressTimer = setTimeout(() => {
+    isLongPress = true;
+    window.petIsLongPress = true;
     menu.classList.add('show');
   }, 500);
 });
@@ -35,12 +40,18 @@ petLayers.addEventListener('mouseup', () => {
 
 petLayers.addEventListener('mouseleave', () => {
   clearTimeout(longPressTimer);
+  isLongPress = false;
+  window.petIsLongPress = false;
 });
 
 // 触摸设备支持
 petLayers.addEventListener('touchstart', (e) => {
   e.preventDefault();
+  isLongPress = false;
+  window.petIsLongPress = false;
   longPressTimer = setTimeout(() => {
+    isLongPress = true;
+    window.petIsLongPress = true;
     menu.classList.add('show');
   }, 500);
 });
