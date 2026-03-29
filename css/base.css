@@ -20,4 +20,5 @@ body {
   width: 700px;
   height: 700px;
   z-index: 2;
+  pointer-events: none;
 }

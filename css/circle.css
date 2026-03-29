@@ -27,6 +27,7 @@
   cursor: grab;
   user-select: none;
   transition: all 0.3s;
+  pointer-events: auto;
 }
 
 .item::before {
