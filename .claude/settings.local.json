@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sqlite3 /Users/project/Desktop/project/shelter/database/user.db \".schema\")",
+      "Bash(cd:*)",
+      "Bash(grep:*)"
+    ]
+  }
+}

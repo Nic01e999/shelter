@@ -4,10 +4,11 @@ import os
 import re
 from string import Template
 from typing import List, Callable, Tuple
+import json
 
 import click
 from dotenv import load_dotenv
-from openai import OpenAI
+import requests
 import platform
 
 from prompts import get_prompt
@@ -20,10 +21,8 @@ class ReActAgent:
         self.project_directory = project_directory
         self.role = role
         self.called_tools = []  # 记录调用过的工具
-        self.client = OpenAI(
-            base_url="https://api.deepseek.com",
-            api_key=ReActAgent.get_api_key(),
-        )
+        self.api_base = "https://api.deepseek.com"
+        self.api_key = ReActAgent.get_api_key()
 
     def run(self, user_input: str, max_iterations: int = 5, history: list = None):
         prompt_template = get_prompt(self.role)
@@ -151,11 +150,13 @@ class ReActAgent:
 
     def call_model(self, messages):
         print("\n\n正在请求模型，请稍等...")
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
+        response = requests.post(
+            f"{self.api_base}/v1/chat/completions",
+            headers={"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"},
+            json={"model": self.model, "messages": messages}
         )
-        content = response.choices[0].message.content
+        response.raise_for_status()
+        content = response.json()["choices"][0]["message"]["content"]
 
         # 处理空响应
         if not content or content.strip() == "":

@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:9999/api';
+const API_BASE = '/api';
 
 /**
  * 获取认证令牌

@@ -15,10 +15,12 @@ class AIService:
     def chat(self, message: str, role: str = 'psychology', history: list = None) -> dict:
         """处理用户消息"""
         if role == 'psychology':
-            # 绑定 user_id 到 create_project
+            # 绑定 user_id 到 create_project 和 list_projects
             bound_create = partial(create_project, user_id=self.user_id)
             bound_create.__name__ = 'create_project'
-            tools = [talk, websearch, list_projects, bound_create, task_breaker]
+            bound_list = partial(list_projects, user_id=self.user_id)
+            bound_list.__name__ = 'list_projects'
+            tools = [talk, websearch, bound_list, bound_create, task_breaker]
         else:
             # taskbreaker 角色，绑定 project_id 到 update_todolist
             bound_update = partial(update_todolist, self.project_id)

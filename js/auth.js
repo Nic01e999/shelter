@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:9999';
+const API_BASE = '';
 
 // 表单切换
 document.querySelectorAll('[data-form]').forEach(link => {

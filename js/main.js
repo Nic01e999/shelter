@@ -122,7 +122,6 @@ document.getElementById('addBtn').addEventListener('click', async () => {
   setPosition(item, 225);
   item.addEventListener('click', () => selectItem(item, { tasks: [] }));
   await saveProject(item);
-  await loadProjects();
 });
 
 // 白噪音控制
@@ -144,7 +143,7 @@ document.getElementById('audio-source').addEventListener('change', (e) => {
 document.getElementById('logout-btn')?.addEventListener('click', async () => {
   const token = localStorage.getItem('authToken');
   if (token) {
-    await fetch('http://localhost:9999/api/auth/logout', {
+    await fetch('/api/auth/logout', {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${token}` }
     });
@@ -254,7 +253,7 @@ document.addEventListener('click', async (e) => {
     return;
   }
 
-  fetch('http://localhost:9999/api/auth/me', {
+  fetch('/api/auth/me', {
     headers: { 'Authorization': `Bearer ${token}` }
   }).then(res => {
     if (!res.ok) {
